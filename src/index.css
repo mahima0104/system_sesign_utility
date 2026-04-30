@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    @apply bg-gray-950 text-gray-100 font-sans antialiased;
+    margin: 0;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-gray-900 border border-gray-800 rounded-2xl;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-brand-500/50 hover:shadow-lg hover:shadow-brand-500/10;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-950;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-600 hover:bg-brand-500 text-white focus:ring-brand-500 px-5 py-2.5;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 focus:ring-gray-500 px-5 py-2.5;
+  }
+
+  .btn-ghost {
+    @apply btn hover:bg-gray-800 text-gray-400 hover:text-gray-100 px-4 py-2;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full;
+  }
+
+  .section-heading {
+    @apply text-2xl font-bold text-white;
+  }
+
+  .mermaid-container svg {
+    @apply max-w-full;
+  }
+}
+
+/* React Flow overrides */
+.react-flow__background {
+  background-color: #030712 !important;
+}
+
+.react-flow__edge-path {
+  stroke: #4d83ff !important;
+  stroke-width: 2px;
+}
+
+.react-flow__arrowhead path {
+  fill: #4d83ff !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply bg-gray-700 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-gray-600; }
