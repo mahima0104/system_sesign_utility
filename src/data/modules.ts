@@ -19,23 +19,6 @@ export const modules: Module[] = [
       { id: 'wsd-concept-2', title: 'The Design Process', description: 'How to approach a system design problem step-by-step.', duration: 5, type: 'concept', component: 'DesignProcessConcept' },
     ],
   },
-  {
-    id: 'top-30-system-design-concepts',
-    title: 'Top 30 System Design Concepts',
-    subtitle: 'The Essential Vocabulary',
-    description: 'A curated tour of the 30 most important concepts in system design, grouped into Networking, APIs, Data Storage, Scaling, Distributed Systems, and Architecture Patterns.',
-    icon: '📋',
-    difficulty: 'beginner',
-    estimatedTime: 20,
-    tags: ['Fundamentals', 'Overview', 'Reference'],
-    color: 'gray',
-    section: 'Introduction',
-    realWorldAnalogy: 'Like a field guide to the most important species before you go on a safari — you can spot and name each one when it appears.',
-    lessons: [
-      { id: 'top30-concept-1', title: 'Top 30 Concepts Overview', description: 'Six groups: Networking, APIs, Storage, Scaling, Distributed Systems, Architecture.', duration: 15, type: 'concept', component: 'Top30Concept' },
-    ],
-  },
-
   // ─── Core Concepts ────────────────────────────────────────────────────────────
   {
     id: 'scalability',

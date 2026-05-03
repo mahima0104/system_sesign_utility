@@ -12,7 +12,6 @@ import MermaidDiagram from '../components/Visualizations/MermaidDiagram';
 import ArchitectureDiagram from '../components/Visualizations/ArchitectureDiagram';
 import AnimatedScenario from '../components/Visualizations/AnimatedScenario';
 import QuizCard from '../components/Learning/QuizCard';
-import Top30ConceptPlanner from '../components/Learning/Top30ConceptPlanner';
 import type { Node, Edge } from 'reactflow';
 
 // ── ReactFlow data for Load Balancing ──────────────────────────────────────────
@@ -136,8 +135,6 @@ export default function ModuleDetailPage() {
           <ConceptDeepDiveView concept={deepDive} />
         </div>
       )}
-
-      {mod.id === 'top-30-system-design-concepts' && <Top30ConceptPlanner />}
 
       {/* Interactive content for load-balancing module */}
       {mod.id === 'load-balancing' && (

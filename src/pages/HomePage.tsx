@@ -16,11 +16,11 @@ const learningAreas = [
     to: '/modules',
   },
   {
-    title: 'Top 30 Interview Concepts',
-    description: 'A focused checklist with 6 tracks, confidence bars, subtopics, and revision memos.',
-    icon: '✨',
+    title: 'Interview Prep Planner',
+    description: 'A workspace to track all 30 must-know concepts — subtopics, confidence (1–5), and revision memos.',
+    icon: '🗂️',
     accent: 'from-cyan-400 to-emerald-400',
-    to: '/module/top-30-system-design-concepts',
+    to: '/interview-prep',
   },
   {
     title: 'Design Patterns',
@@ -35,6 +35,20 @@ const learningAreas = [
     icon: '🚀',
     accent: 'from-yellow-300 to-orange-400',
     to: '/kafka',
+  },
+  {
+    title: 'PayBank Banking Case Study',
+    description: 'All 8 Core Concepts applied to one UPI-style bank — interactive demos plus a design challenge.',
+    icon: '🏦',
+    accent: 'from-emerald-300 to-cyan-400',
+    to: '/case-study/paybank',
+  },
+  {
+    title: 'QuickEats Load Balancing Case Study',
+    description: 'L4 vs L7, the 5 algorithms, health checks, sticky sessions, DNS LB, anycast — all on a Friday-night food-delivery rush.',
+    icon: '🍕',
+    accent: 'from-orange-300 to-yellow-300',
+    to: '/case-study/quickeats',
   },
 ];
 
@@ -130,10 +144,10 @@ export default function HomePage() {
 
           <div className="mt-7 inline-flex flex-wrap gap-3 rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-2.5 shadow-lg shadow-cyan-500/10">
             <Link
-              to="/module/top-30-system-design-concepts"
+              to="/interview-prep"
               className="rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 py-2 text-sm font-semibold text-gray-950 shadow-md shadow-cyan-500/30 transition-all hover:from-emerald-300 hover:to-cyan-300"
             >
-              Start Top 30 →
+              Open Interview Planner →
             </Link>
             <Link
               to="/modules"
