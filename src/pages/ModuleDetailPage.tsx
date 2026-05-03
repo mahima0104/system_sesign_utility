@@ -1,11 +1,13 @@
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getModule } from '../data/modules';
+import { getConceptDeepDive } from '../data/concepts';
 import { useProgressStore } from '../store/useProgressStore';
-import { loadBalancingQuiz, cachingQuiz, databaseQuiz } from '../data/quizzes';
+import { loadBalancingQuiz, cachingQuiz } from '../data/quizzes';
 import ProgressBar from '../components/Common/ProgressBar';
 import DifficultyBadge from '../components/Common/DifficultyBadge';
 import LessonTypeIcon from '../components/Common/LessonTypeIcon';
+import ConceptDeepDiveView from '../components/Common/ConceptDeepDiveView';
 import MermaidDiagram from '../components/Visualizations/MermaidDiagram';
 import ArchitectureDiagram from '../components/Visualizations/ArchitectureDiagram';
 import AnimatedScenario from '../components/Visualizations/AnimatedScenario';
@@ -58,11 +60,6 @@ sequenceDiagram
   end
 `.trim();
 
-const quizMap: Record<string, typeof loadBalancingQuiz> = {
-  'load-balancing': loadBalancingQuiz,
-  caching:          cachingQuiz,
-  databases:        databaseQuiz,
-};
 
 export default function ModuleDetailPage() {
   const { moduleId } = useParams<{ moduleId: string }>();
@@ -80,6 +77,7 @@ export default function ModuleDetailPage() {
   }
 
   const progress = getModuleProgress(mod.lessons.map((l) => l.id));
+  const deepDive = getConceptDeepDive(mod.id);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
@@ -130,6 +128,13 @@ export default function ModuleDetailPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* Concept deep-dive — rendered for modules that have rich content authored. */}
+      {deepDive && (
+        <div className="mb-10">
+          <ConceptDeepDiveView concept={deepDive} />
+        </div>
+      )}
 
       {/* Interactive content for load-balancing module */}
       {mod.id === 'load-balancing' && (

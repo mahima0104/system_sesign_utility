@@ -8,7 +8,7 @@ interface Props {
   onComplete?: (score: number) => void;
 }
 
-export default function QuizCard({ questions, quizId, onComplete }: Props) {
+export default function QuizCard({ questions, quizId: _quizId, onComplete }: Props) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<(number | null)[]>(Array(questions.length).fill(null));

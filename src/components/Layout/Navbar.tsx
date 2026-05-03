@@ -15,6 +15,8 @@ const XpBadge = () => {
 const navLinks = [
   { to: '/', label: 'Home' },
   { to: '/modules', label: 'Modules' },
+  { to: '/patterns', label: 'Patterns' },
+  { to: '/kafka', label: 'Kafka' },
   { to: '/progress', label: 'Progress' },
 ];
 
