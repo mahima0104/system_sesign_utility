@@ -1,15 +1,26 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+interface ConceptProgress {
+  completedSubTopics: string[];
+  confidence: number;
+  memo: string;
+}
+
 interface ProgressState {
   completedLessons: string[];
   quizScores: Record<string, number>;
+  conceptProgress: Record<string, ConceptProgress>;
   totalXp: number;
   currentStreak: number;
   lastVisitedModule: string | null;
 
   completeLesson: (lessonId: string, xpReward?: number) => void;
   saveQuizScore: (quizId: string, score: number) => void;
+  toggleConceptSubTopic: (conceptId: string, subTopic: string) => void;
+  setConceptConfidence: (conceptId: string, confidence: number) => void;
+  setConceptMemo: (conceptId: string, memo: string) => void;
+  getConceptProgress: (conceptId: string, subTopics: string[]) => number;
   setLastVisitedModule: (moduleId: string) => void;
   getModuleProgress: (lessonIds: string[]) => number;
   isLessonComplete: (lessonId: string) => boolean;
@@ -19,9 +30,16 @@ interface ProgressState {
 const initialState = {
   completedLessons: [] as string[],
   quizScores: {} as Record<string, number>,
+  conceptProgress: {} as Record<string, ConceptProgress>,
   totalXp: 0,
   currentStreak: 0,
   lastVisitedModule: null as string | null,
+};
+
+const emptyConceptProgress: ConceptProgress = {
+  completedSubTopics: [],
+  confidence: 0,
+  memo: '',
 };
 
 export const useProgressStore = create<ProgressState>()(
@@ -46,7 +64,63 @@ export const useProgressStore = create<ProgressState>()(
         }));
       },
 
+      toggleConceptSubTopic: (conceptId, subTopic) => {
+        set((s) => {
+          const current = s.conceptProgress[conceptId] ?? emptyConceptProgress;
+          const completedSubTopics = current.completedSubTopics.includes(subTopic)
+            ? current.completedSubTopics.filter((item) => item !== subTopic)
+            : [...current.completedSubTopics, subTopic];
+
+          return {
+            conceptProgress: {
+              ...s.conceptProgress,
+              [conceptId]: {
+                ...current,
+                completedSubTopics,
+              },
+            },
+          };
+        });
+      },
+
+      setConceptConfidence: (conceptId, confidence) => {
+        set((s) => {
+          const current = s.conceptProgress[conceptId] ?? emptyConceptProgress;
+          return {
+            conceptProgress: {
+              ...s.conceptProgress,
+              [conceptId]: {
+                ...current,
+                confidence: Math.max(0, Math.min(100, confidence)),
+              },
+            },
+          };
+        });
+      },
+
+      setConceptMemo: (conceptId, memo) => {
+        set((s) => {
+          const current = s.conceptProgress[conceptId] ?? emptyConceptProgress;
+          return {
+            conceptProgress: {
+              ...s.conceptProgress,
+              [conceptId]: {
+                ...current,
+                memo,
+              },
+            },
+          };
+        });
+      },
+
       setLastVisitedModule: (moduleId) => set({ lastVisitedModule: moduleId }),
+
+      getConceptProgress: (conceptId, subTopics) => {
+        const current = get().conceptProgress[conceptId];
+        if (!subTopics.length || !current) return 0;
+        const done = subTopics.filter((subTopic) => current.completedSubTopics.includes(subTopic)).length;
+        return Math.round((done / subTopics.length) * 100);
+      },
 
       getModuleProgress: (lessonIds) => {
         const { completedLessons } = get();
