@@ -15,6 +15,7 @@ const KafkaPage         = lazy(() => import('./pages/KafkaPage'));
 const UberKafkaPage     = lazy(() => import('./pages/UberKafkaPage'));
 const BankingCaseStudyPage = lazy(() => import('./pages/BankingCaseStudyPage'));
 const LoadBalancingCaseStudyPage = lazy(() => import('./pages/LoadBalancingCaseStudyPage'));
+const ArchitectureCaseStudyPage = lazy(() => import('./pages/ArchitectureCaseStudyPage'));
 
 function PageSpinner() {
   return (
@@ -43,7 +44,8 @@ export default function App() {
           <Route path="/kafka"                 element={<Suspense fallback={<PageSpinner />}><KafkaPage /></Suspense>} />
           <Route path="/case-study/uber-kafka" element={<Suspense fallback={<PageSpinner />}><UberKafkaPage /></Suspense>} />
           <Route path="/case-study/paybank"    element={<Suspense fallback={<PageSpinner />}><BankingCaseStudyPage /></Suspense>} />
-          <Route path="/case-study/quickeats"  element={<Suspense fallback={<PageSpinner />}><LoadBalancingCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/quickeats"    element={<Suspense fallback={<PageSpinner />}><LoadBalancingCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/streamcart"  element={<Suspense fallback={<PageSpinner />}><ArchitectureCaseStudyPage /></Suspense>} />
           <Route path="/progress"              element={<ProgressPage />} />
           <Route path="*"                      element={<Navigate to="/" replace />} />
         </Route>

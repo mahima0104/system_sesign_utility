@@ -8,6 +8,33 @@ import DifficultyBadge from '../components/Common/DifficultyBadge';
 import LessonTypeIcon from '../components/Common/LessonTypeIcon';
 import type { Difficulty, Module } from '../types';
 
+// ─── Database Scaling sub-category definitions ────────────────────────────────
+const DB_SCALING_SUBCATEGORIES: {
+  key: string;
+  label: string;
+  icon: string;
+  accent: string;
+  badgeColor: string;
+  ids: string[];
+}[] = [
+  {
+    key: 'reads',
+    label: 'Scaling Reads',
+    icon: '📖',
+    accent: 'border-indigo-500/40 bg-indigo-500/5',
+    badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+    ids: ['indexing', 'query-optimization', 'read-replicas', 'connection-pooling'],
+  },
+  {
+    key: 'writes',
+    label: 'Scaling Writes',
+    icon: '✍️',
+    accent: 'border-violet-500/40 bg-violet-500/5',
+    badgeColor: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+    ids: ['vertical-partitioning', 'sharding', 'database-compression'],
+  },
+];
+
 const SECTION_ICONS: Record<string, string> = {
   'Introduction': '🏁',
   'Core Concepts': '🧠',
@@ -222,6 +249,96 @@ function ModuleCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Sub-category group (used inside Database Scaling)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SubCategoryGroup({
+  label,
+  icon,
+  accent,
+  badgeColor,
+  modules,
+  expandedModuleIds,
+  defaultOpen,
+}: {
+  label: string;
+  icon: string;
+  accent: string;
+  badgeColor: string;
+  modules: Module[];
+  expandedModuleIds: Set<string>;
+  defaultOpen: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const { getModuleProgress } = useProgressStore();
+  const doneCount = modules.filter(
+    (m) => getModuleProgress(m.lessons.map((l) => l.id)) === 100
+  ).length;
+  const pct = modules.length ? Math.round((doneCount / modules.length) * 100) : 0;
+
+  return (
+    <div className={`rounded-xl border ${accent} overflow-hidden`}>
+      {/* Sub-category header */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-colors group"
+        aria-expanded={open}
+      >
+        <span className="text-lg">{icon}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center flex-wrap gap-2">
+            <span className="text-sm font-bold text-white">{label}</span>
+            <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${badgeColor}`}>
+              {modules.length} module{modules.length !== 1 ? 's' : ''}
+            </span>
+            {doneCount > 0 && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                {doneCount}/{modules.length} done
+              </span>
+            )}
+          </div>
+          <div className="mt-1.5 max-w-xs">
+            <ProgressBar value={pct} size="sm" showPercent={false} color={pct === 100 ? 'success' : 'brand'} />
+          </div>
+        </div>
+        <motion.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.18 }}
+          className="flex-shrink-0 w-6 h-6 rounded-full border border-gray-700 bg-gray-900 flex items-center justify-center text-gray-400 text-xs group-hover:border-gray-600"
+          aria-hidden
+        >
+          ▾
+        </motion.span>
+      </button>
+
+      {/* Module list */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="overflow-hidden border-t border-white/5"
+          >
+            <div className="px-3 pb-3 pt-2 space-y-2">
+              {modules.map((mod, i) => (
+                <ModuleCard
+                  key={mod.id}
+                  mod={mod}
+                  index={i}
+                  defaultOpen={expandedModuleIds.has(mod.id)}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Section accordion
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -317,6 +434,29 @@ function Section({
                 </Link>
               )}
 
+              {name === 'Architectural Patterns' && (
+                <Link
+                  to="/case-study/streamcart"
+                  className="block rounded-xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-transparent p-4 hover:border-purple-400/60 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">🎬</div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-white font-bold">Case Study: StreamCart (live-video e-commerce)</h3>
+                        <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 border border-purple-500/30">
+                          Interactive
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                        Client-server, monolith evolution, event-driven fan-out, CORS, serverless pipelines — all six patterns in one real enterprise architecture. Includes an interview exercise.
+                      </p>
+                      <div className="mt-2 text-xs font-medium text-purple-300">Open case study →</div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
               {name === 'Load Balancing' && (
                 <Link
                   to="/case-study/quickeats"
@@ -340,14 +480,56 @@ function Section({
                 </Link>
               )}
 
-              {modules.map((mod, i) => (
-                <ModuleCard
-                  key={mod.id}
-                  mod={mod}
-                  index={i}
-                  defaultOpen={expandedModuleIds.has(mod.id)}
-                />
-              ))}
+              {name === 'Database Scaling' && (
+                <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3 flex flex-wrap gap-4 items-center">
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <span className="text-lg">📖</span>
+                    <div>
+                      <p className="font-semibold text-indigo-300 text-xs uppercase tracking-wider">Scaling Reads</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">Indexing · Query optimisation · Read replicas · Connection pooling</p>
+                    </div>
+                  </div>
+                  <div className="hidden sm:block w-px h-8 bg-gray-700" />
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <span className="text-lg">✍️</span>
+                    <div>
+                      <p className="font-semibold text-violet-300 text-xs uppercase tracking-wider">Scaling Writes</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">Partitioning · Sharding · Compression</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {name === 'Database Scaling' ? (
+                // Render sub-categories for Database Scaling
+                DB_SCALING_SUBCATEGORIES.map((sub) => {
+                  const subMods = sub.ids
+                    .map((id) => modules.find((m) => m.id === id))
+                    .filter(Boolean) as Module[];
+                  if (subMods.length === 0) return null;
+                  return (
+                    <SubCategoryGroup
+                      key={sub.key}
+                      label={sub.label}
+                      icon={sub.icon}
+                      accent={sub.accent}
+                      badgeColor={sub.badgeColor}
+                      modules={subMods}
+                      expandedModuleIds={expandedModuleIds}
+                      defaultOpen={true}
+                    />
+                  );
+                })
+              ) : (
+                modules.map((mod, i) => (
+                  <ModuleCard
+                    key={mod.id}
+                    mod={mod}
+                    index={i}
+                    defaultOpen={expandedModuleIds.has(mod.id)}
+                  />
+                ))
+              )}
             </div>
           </motion.div>
         )}

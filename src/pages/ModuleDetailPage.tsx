@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getModule } from '../data/modules';
 import { getConceptDeepDive } from '../data/concepts';
 import { useProgressStore } from '../store/useProgressStore';
@@ -60,6 +61,180 @@ sequenceDiagram
   end
 `.trim();
 
+
+// ── Design Process stepper ────────────────────────────────────────────────────
+
+const DESIGN_STEPS = [
+  {
+    icon: '🎯',
+    title: 'Clarify requirements',
+    simple: 'Before building anything, ask questions. Who uses it? How many? How fast must it be?',
+    analogy: 'Like an architect asking the client: "How many floors? Parking? Budget?" before drawing a single line.',
+    example: 'Interviewer says "Design WhatsApp." You ask: "How many users? Text only or media? Global or one country?"',
+    tip: 'Spend the first 3–5 minutes ONLY asking questions. Never start designing in silence.',
+  },
+  {
+    icon: '🔢',
+    title: 'Estimate scale',
+    simple: 'Write rough numbers on paper. How many requests per second? How much storage per day?',
+    analogy: 'Like a chef calculating: "300 guests × 3 courses = 900 plates. I need 5 chefs."',
+    example: '100M users × 1 message/day = 1,150 messages/sec. Each 1 KB → 100 GB storage/day.',
+    tip: 'Interviewers want to see you reason with numbers, not guess. Be wrong confidently, then adjust.',
+  },
+  {
+    icon: '✏️',
+    title: 'Design the high-level architecture',
+    simple: 'Draw the big boxes: client, server, database, cache. Show how data flows between them.',
+    analogy: 'Like drawing a floor plan — rooms first, furniture later.',
+    example: 'Client → Load Balancer → App Servers → Cache (Redis) → Database (Postgres)',
+    tip: 'Start with a 4-box diagram. Resist jumping to microservices on slide one.',
+  },
+  {
+    icon: '🗄️',
+    title: 'Design the data model',
+    simple: 'What do you store? Users? Messages? Posts? What are the relationships between them?',
+    analogy: 'Like deciding what goes in each room of a house before buying furniture.',
+    example: 'User(id, name, phone), Message(id, sender_id, receiver_id, body, ts), Conversation(id, participants[])',
+    tip: 'SQL for structured relational data, NoSQL for huge scale or flexible schema. Justify your choice.',
+  },
+  {
+    icon: '🔌',
+    title: 'Design the APIs',
+    simple: 'Define the endpoints clients will call. What goes in, what comes out.',
+    analogy: 'Like writing a restaurant menu — what can customers order and what will they get?',
+    example: 'POST /messages  {to, body} → 201.  GET /messages/{id} → {body, ts, seen}',
+    tip: 'Keep APIs simple and versioned (v1/). Show you think about auth (Bearer token).',
+  },
+  {
+    icon: '⚠️',
+    title: 'Identify bottlenecks & trade-offs',
+    simple: 'Where will the system break first? What did you sacrifice to make something else faster?',
+    analogy: 'Like a highway planner asking: "Where will traffic jam at rush hour?"',
+    example: '"The single DB will be the bottleneck at 10K RPS — I would add a read replica and Redis cache."',
+    tip: 'This is what separates senior candidates. Proactively say what is wrong with your own design.',
+  },
+  {
+    icon: '📈',
+    title: 'Scale & harden',
+    simple: 'Now make it handle 10× the load. Add redundancy so it does not crash.',
+    analogy: 'Like adding more checkout lanes at a supermarket before the holiday rush.',
+    example: 'Add horizontal scaling for app servers, shard the DB by user_id, use a CDN for media.',
+    tip: 'Do not over-engineer from the start. Scale in layers — prove you know when to add complexity.',
+  },
+];
+
+function DesignProcessStepper() {
+  const [active, setActive] = useState(0);
+  const step = DESIGN_STEPS[active];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15 }}
+      className="mb-10"
+    >
+      <h2 className="section-heading mb-2">🗺️ The 7-Step Design Process</h2>
+      <p className="text-gray-400 text-sm mb-5">
+        Every system design interview follows the same playbook. Click each step to see the simple explanation, a real-world analogy, and an example.
+      </p>
+
+      {/* Step pills */}
+      <div className="flex flex-wrap gap-2 mb-5">
+        {DESIGN_STEPS.map((s, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(i)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+              active === i
+                ? 'border-brand-400 bg-brand-500/20 text-brand-200'
+                : 'border-gray-700 bg-gray-900 text-gray-400 hover:border-gray-600 hover:text-gray-200'
+            }`}
+          >
+            <span>{s.icon}</span>
+            <span className="hidden sm:inline">{i + 1}.</span> {s.title}
+          </button>
+        ))}
+      </div>
+
+      {/* Active step card */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={active}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+          className="rounded-2xl border border-gray-800 bg-gray-900/60 overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-800 bg-gray-900">
+            <span className="text-3xl">{step.icon}</span>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                Step {active + 1} of {DESIGN_STEPS.length}
+              </p>
+              <h3 className="text-lg font-bold text-white">{step.title}</h3>
+            </div>
+            <div className="ml-auto flex gap-1">
+              <button
+                disabled={active === 0}
+                onClick={() => setActive((a) => a - 1)}
+                className="w-8 h-8 rounded-lg border border-gray-700 bg-gray-800 text-gray-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-sm"
+              >
+                ←
+              </button>
+              <button
+                disabled={active === DESIGN_STEPS.length - 1}
+                onClick={() => setActive((a) => a + 1)}
+                className="w-8 h-8 rounded-lg border border-gray-700 bg-gray-800 text-gray-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-sm"
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="p-5 grid sm:grid-cols-3 gap-4">
+            <div className="rounded-xl border border-brand-500/20 bg-brand-500/5 p-4">
+              <p className="text-[10px] uppercase tracking-wider text-brand-400 font-semibold mb-2">📖 In plain English</p>
+              <p className="text-sm text-gray-200 leading-relaxed">{step.simple}</p>
+            </div>
+            <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+              <p className="text-[10px] uppercase tracking-wider text-yellow-400 font-semibold mb-2">💡 Real-world analogy</p>
+              <p className="text-sm text-gray-200 leading-relaxed italic">{step.analogy}</p>
+            </div>
+            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+              <p className="text-[10px] uppercase tracking-wider text-cyan-400 font-semibold mb-2">✏️ Example</p>
+              <p className="text-sm text-gray-200 leading-relaxed font-mono text-xs">{step.example}</p>
+            </div>
+          </div>
+
+          {/* Interview tip */}
+          <div className="px-5 pb-5">
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-wider text-emerald-400 font-semibold mb-1">🎯 Interview tip</p>
+              <p className="text-sm text-gray-200">{step.tip}</p>
+            </div>
+          </div>
+
+          {/* Progress dots */}
+          <div className="flex items-center justify-center gap-1.5 pb-4">
+            {DESIGN_STEPS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                className={`rounded-full transition-all ${
+                  i === active ? 'w-5 h-2 bg-brand-400' : 'w-2 h-2 bg-gray-700 hover:bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 export default function ModuleDetailPage() {
   const { moduleId } = useParams<{ moduleId: string }>();
@@ -135,6 +310,9 @@ export default function ModuleDetailPage() {
           <ConceptDeepDiveView concept={deepDive} />
         </div>
       )}
+
+      {/* ── What is System Design — Design Process stepper ─────────────────── */}
+      {mod.id === 'what-is-system-design' && <DesignProcessStepper />}
 
       {/* Interactive content for load-balancing module */}
       {mod.id === 'load-balancing' && (

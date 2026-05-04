@@ -50,6 +50,13 @@ const learningAreas = [
     accent: 'from-orange-300 to-yellow-300',
     to: '/case-study/quickeats',
   },
+  {
+    title: 'StreamCart Architecture Case Study',
+    description: 'Client-server, monolith evolution, event-driven fan-out, CORS, serverless — all six architectural patterns in one enterprise live-commerce platform.',
+    icon: '🎬',
+    accent: 'from-purple-400 to-pink-400',
+    to: '/case-study/streamcart',
+  },
 ];
 
 const systemNodes = [
