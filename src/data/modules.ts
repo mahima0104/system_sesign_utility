@@ -1174,6 +1174,40 @@ export const modules: Module[] = [
 
   // ─── Architectural Patterns ───────────────────────────────────────────────────
   {
+    id: 'client-server-architecture',
+    title: 'Client-Server Architecture',
+    subtitle: 'The Foundation of Web and Mobile Systems',
+    description: 'Understand how clients, servers, networks, DNS, CDN, load balancers, gateways, caches, and databases work together in the request-response model.',
+    icon: '🌐',
+    difficulty: 'beginner',
+    estimatedTime: 18,
+    tags: ['Architecture', 'Networking', 'APIs', 'Fundamentals'],
+    color: 'cyan',
+    section: 'Architectural Patterns',
+    realWorldAnalogy: 'Like ordering food at a restaurant — the customer makes a request, staff route it, the kitchen prepares it, and the response comes back.',
+    lessons: [
+      { id: 'csa-concept-1', title: 'Client, Server, and Network', description: 'The core components and request-response flow.', duration: 6, type: 'concept', component: 'ClientServerBasicsConcept' },
+      { id: 'csa-concept-2', title: 'Tiers and Scaling', description: '1-tier, 2-tier, 3-tier, N-tier, and scaling strategies.', duration: 8, type: 'concept', component: 'ClientServerTiersConcept' },
+    ],
+  },
+  {
+    id: 'monolithic-architecture',
+    title: 'Monolithic Architecture',
+    subtitle: 'Simple, Fast, and Often the Right Start',
+    description: 'Learn how monoliths work, why many products start there, how to keep them modular, when they become painful, and when to split into services.',
+    icon: '🧱',
+    difficulty: 'beginner',
+    estimatedTime: 16,
+    tags: ['Architecture', 'Monolith', 'Modular Design', 'Trade-offs'],
+    color: 'orange',
+    section: 'Architectural Patterns',
+    realWorldAnalogy: 'Like a department store where every team works in one building — convenient and efficient early, but expansion needs careful organization.',
+    lessons: [
+      { id: 'mono-concept-1', title: 'What is a Monolith?', description: 'Single deployable application, internal layers, and modular monolith thinking.', duration: 7, type: 'concept', component: 'MonolithBasicsConcept' },
+      { id: 'mono-concept-2', title: 'Scaling and Splitting', description: 'How to scale a monolith and when to extract services.', duration: 7, type: 'concept', component: 'MonolithScalingConcept' },
+    ],
+  },
+  {
     id: 'microservices',
     title: 'Microservices',
     subtitle: 'The Restaurant Kitchen Analogy',
