@@ -81,6 +81,24 @@ function Topic({ icon, title, scenario, takeaway, children }: { icon: string; ti
   );
 }
 
+function JWTVisual() {
+  return (
+    <div className="grid sm:grid-cols-3 gap-3 text-xs">
+      {[
+        ['Header', '{ "alg": "RS256", "typ": "JWT" }', 'Algorithm and key metadata.'],
+        ['Payload', '{ "sub": "cus_123", "aud": "paybank-api", "exp": 1777891200 }', 'Readable claims, not secrets.'],
+        ['Signature', 'RS256(header.payload)', 'Tamper-evident proof from trusted issuer.'],
+      ].map(([title, code, note]) => (
+        <div key={title} className="rounded-xl border border-red-500/20 bg-red-500/5 p-3">
+          <p className="font-bold text-red-200">{title}</p>
+          <pre className="mt-2 text-[10px] text-gray-300 whitespace-pre-wrap break-words">{code}</pre>
+          <p className="mt-2 text-gray-500 leading-relaxed">{note}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function APISecurityCaseStudyPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
@@ -105,7 +123,19 @@ export default function APISecurityCaseStudyPage() {
         scenario="A customer proves identity with password and OTP. The API then checks whether that customer can view this specific account."
         takeaway="Authentication verifies identity. Authorization checks permission. Keep those two ideas separate in your design explanation."
       >
-        <SecurityFlow steps={['Login + OTP', 'Identity verified', 'JWT issued', 'API checks scope', 'Account allowed']} />
+        <div className="space-y-4">
+          <SecurityFlow steps={['Login + OTP', 'Identity verified', 'JWT issued', 'API checks scope', 'Account allowed']} />
+          <div className="grid sm:grid-cols-2 gap-3 text-xs">
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+              <p className="text-sm font-bold text-emerald-200">Allowed</p>
+              <p className="mt-2 text-gray-300 leading-relaxed">Customer `cus_123` requests `GET /accounts/acc_101`; ownership table confirms `acc_101` belongs to `cus_123`.</p>
+            </div>
+            <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+              <p className="text-sm font-bold text-red-200">Blocked</p>
+              <p className="mt-2 text-gray-300 leading-relaxed">Same logged-in customer changes URL to `GET /accounts/acc_999`; token is valid, but object-level authorization fails.</p>
+            </div>
+          </div>
+        </div>
       </Topic>
 
       <Topic
@@ -132,7 +162,31 @@ export default function APISecurityCaseStudyPage() {
         scenario="Employees use corporate SSO, partners connect through OAuth consent, and internal services verify JWT claims at the gateway."
         takeaway="JWT is a token format. OAuth 2.0 is delegated authorization. SSO is one-login access across apps, often built on SAML or OpenID Connect."
       >
-        <SecurityFlow steps={['User opens app', 'SSO/OAuth redirect', 'Identity provider', 'JWT/access token', 'Gateway verifies']} />
+        <div className="space-y-4">
+          <SecurityFlow steps={['User opens app', 'SSO/OAuth redirect', 'Identity provider', 'JWT/access token', 'Gateway verifies']} />
+          <JWTVisual />
+        </div>
+      </Topic>
+
+      <Topic
+        icon="🧨"
+        title="Security Failure Scenarios"
+        scenario="The most useful security learning happens when we trace what breaks. PayBank documents these failure modes before launch."
+        takeaway="Always mention abuse cases: valid token but wrong object, stolen token, missing audience check, broad OAuth scopes, and employee deprovisioning."
+      >
+        <div className="grid sm:grid-cols-2 gap-3 text-xs">
+          {[
+            ['Missing audience check', 'A JWT meant for analytics-api is accepted by transfer-api. Fix: verify aud on every API.'],
+            ['Long-lived JWT', 'A stolen access token works for weeks. Fix: short access expiry plus refresh-token rotation.'],
+            ['No object authorization', 'User changes account id and reads another account. Fix: ownership/policy check in domain service.'],
+            ['Employee deprovisioning lag', 'Ex-employee keeps active app session. Fix: short sessions, IdP disable event, session revocation.'],
+          ].map(([title, text]) => (
+            <div key={title} className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+              <p className="font-bold text-red-200">{title}</p>
+              <p className="mt-1 text-gray-400 leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
       </Topic>
 
       <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-500/10 to-rose-500/5 p-5">

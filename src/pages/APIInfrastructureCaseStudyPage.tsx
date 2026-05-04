@@ -81,6 +81,30 @@ function Topic({ icon, title, scenario, takeaway, children }: { icon: string; ti
   );
 }
 
+function ResponseExample() {
+  return (
+    <div className="rounded-xl border border-gray-800 bg-gray-950 overflow-hidden">
+      <div className="px-4 py-2 border-b border-gray-800 text-[10px] uppercase tracking-wider font-semibold text-orange-300">
+        429 response contract
+      </div>
+      <pre className="p-4 overflow-x-auto text-xs leading-relaxed text-gray-300">
+        <code>{`HTTP/1.1 429 Too Many Requests
+Retry-After: 20
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 0
+
+{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Transfer API limit exceeded. Retry after 20 seconds.",
+    "requestId": "req_edge_551"
+  }
+}`}</code>
+      </pre>
+    </div>
+  );
+}
+
 export default function APIInfrastructureCaseStudyPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
@@ -105,7 +129,22 @@ export default function APIInfrastructureCaseStudyPage() {
         scenario="The gateway is the front door. It terminates TLS, checks auth metadata, routes to services, applies quotas, and adds trace IDs."
         takeaway="An API gateway centralizes cross-cutting concerns: routing, authentication hooks, rate limits, observability, request shaping, and version migration."
       >
-        <InfraFlow steps={['Client request', 'TLS + gateway', 'Auth + route', 'Transfer service', 'Trace + response']} />
+        <div className="space-y-4">
+          <InfraFlow steps={['Client request', 'TLS + gateway', 'Auth + route', 'Transfer service', 'Trace + response']} />
+          <div className="grid sm:grid-cols-4 gap-2 text-xs">
+            {[
+              ['Routing', '/v1/transfers → Transfer API'],
+              ['Auth hook', 'Verify JWT and scopes'],
+              ['Observability', 'Attach request id and trace id'],
+              ['Policy', 'Apply tenant quota and API version rules'],
+            ].map(([title, text]) => (
+              <div key={title} className="rounded-lg border border-gray-700 bg-gray-950/60 p-3">
+                <p className="font-bold text-orange-200">{title}</p>
+                <p className="mt-1 text-gray-400 leading-relaxed">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </Topic>
 
       <Topic
@@ -114,15 +153,41 @@ export default function APIInfrastructureCaseStudyPage() {
         scenario="A buggy partner integration retries 10,000 times per minute. Without rate limits, the bank API slows down for everyone."
         takeaway="Rate limiting protects shared systems. Use per-user, per-client, per-IP, and endpoint-specific limits with clear 429 responses."
       >
-        <div className="grid sm:grid-cols-3 gap-3 text-xs">
+        <div className="space-y-4">
+          <div className="grid sm:grid-cols-3 gap-3 text-xs">
+            {[
+              ['Retail mobile', '300 reads/min, 30 transfers/min', 'Token bucket allows normal bursts after login.'],
+              ['Merchant API', '1,000 reads/min, 120 refunds/min', 'Sliding window keeps partner traffic smooth.'],
+              ['Fintech partner', 'Contract-specific quotas', 'Endpoint-level limits protect money movement.'],
+            ].map(([name, quota, text]) => (
+              <div key={name} className="rounded-lg border border-orange-500/20 bg-orange-500/5 p-3">
+                <p className="font-bold text-orange-200">{name}</p>
+                <p className="mt-1 text-white">{quota}</p>
+                <p className="mt-1 text-gray-400 leading-relaxed">{text}</p>
+              </div>
+            ))}
+          </div>
+          <ResponseExample />
+        </div>
+      </Topic>
+
+      <Topic
+        icon="🧯"
+        title="Failure Mode: Rate Limit Store Down"
+        scenario="Distributed rate limiting usually depends on Redis or a gateway-managed counter store. PayBank decides fail behavior by risk level."
+        takeaway="Senior designs include dependency failure behavior. Fail closed for dangerous writes, fail open or degrade for safe reads."
+      >
+        <div className="grid sm:grid-cols-2 gap-3 text-xs">
           {[
-            ['Token bucket', 'Allows short bursts for mobile clients.'],
-            ['Sliding window', 'Smooths abusive partner traffic.'],
-            ['Endpoint quota', 'Stricter limits on money-moving APIs.'],
-          ].map(([name, text]) => (
-            <div key={name} className="rounded-lg border border-orange-500/20 bg-orange-500/5 p-3">
-              <p className="font-bold text-orange-200">{name}</p>
-              <p className="mt-1 text-gray-400 leading-relaxed">{text}</p>
+            ['Transfer API', 'Fail closed', 'If the quota store is unavailable, reject high-risk money-moving requests with a clear temporary error.'],
+            ['Account balance read', 'Fail open with local fallback', 'Allow limited local reads so customers can still view basic information.'],
+            ['Partner bulk export', 'Fail closed', 'Batch partners can retry later without affecting retail customers.'],
+            ['Health/status API', 'Bypass limit', 'Keep operational health checks working for monitoring and failover.'],
+          ].map(([api, policy, reason]) => (
+            <div key={api} className="rounded-lg border border-gray-700 bg-gray-950/60 p-3">
+              <p className="font-bold text-white">{api}</p>
+              <p className="mt-1 text-orange-200">{policy}</p>
+              <p className="mt-1 text-gray-400 leading-relaxed">{reason}</p>
             </div>
           ))}
         </div>

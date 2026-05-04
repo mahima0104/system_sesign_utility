@@ -85,6 +85,21 @@ function Topic({ icon, title, scenario, takeaway, children }: { icon: string; ti
   );
 }
 
+function CodeBlock({ title, code, tone = 'yellow' }: { title: string; code: string; tone?: 'yellow' | 'red' | 'green' }) {
+  const titleTone = tone === 'red' ? 'text-red-300' : tone === 'green' ? 'text-emerald-300' : 'text-yellow-300';
+
+  return (
+    <div className="rounded-xl border border-gray-800 bg-gray-950 overflow-hidden">
+      <div className={`px-4 py-2 border-b border-gray-800 text-[10px] uppercase tracking-wider font-semibold ${titleTone}`}>
+        {title}
+      </div>
+      <pre className="p-4 overflow-x-auto text-xs leading-relaxed text-gray-300">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
 export default function APIDesignCaseStudyPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
@@ -118,7 +133,37 @@ export default function APIDesignCaseStudyPage() {
         scenario="A customer taps Pay, the network drops, and the mobile app retries. PayBank must not debit twice."
         takeaway="Payment and transfer APIs should require idempotency keys. Store the first result and return it for safe retries."
       >
-        <Flow steps={['Client sends key', 'API checks key store', 'First request creates transfer', 'Retry uses same key', 'Same result returned']} />
+        <div className="space-y-4">
+          <Flow steps={['Client sends key', 'API checks key store', 'First request creates transfer', 'Retry uses same key', 'Same result returned']} />
+          <div className="grid sm:grid-cols-2 gap-3">
+            <CodeBlock
+              title="Request contract"
+              code={`POST /v1/transfers
+Idempotency-Key: tr_2026_05_04_abc
+Content-Type: application/json
+
+{
+  "sourceAccountId": "acc_101",
+  "destinationAccountId": "acc_909",
+  "amount": "2500.00",
+  "currency": "INR",
+  "note": "Rent"
+}`}
+            />
+            <CodeBlock
+              title="Retry response"
+              tone="green"
+              code={`HTTP/1.1 201 Created
+
+{
+  "transferId": "txn_77821",
+  "status": "completed",
+  "idempotencyKey": "tr_2026_05_04_abc",
+  "createdAt": "2026-05-04T08:10:00Z"
+}`}
+            />
+          </div>
+        </div>
       </Topic>
 
       <Topic
@@ -148,7 +193,80 @@ export default function APIDesignCaseStudyPage() {
         scenario="PayBank uses REST for stable resources, GraphQL for customer dashboard aggregation, and gRPC for internal low-latency service calls."
         takeaway="No one API style wins everywhere. Match style to consumer needs: REST for resources, GraphQL for flexible reads, gRPC for internal performance, webhooks for callbacks."
       >
-        <Flow steps={['REST transfer', 'GraphQL dashboard', 'gRPC risk check', 'Webhook callback', 'Partner notified']} tone="pink" />
+        <div className="space-y-4">
+          <Flow steps={['REST transfer', 'GraphQL dashboard', 'gRPC risk check', 'Webhook callback', 'Partner notified']} tone="pink" />
+          <div className="rounded-xl border border-gray-800 overflow-hidden overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="bg-gray-950 text-gray-400 uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th className="px-3 py-2 text-left">Need</th>
+                  <th className="px-3 py-2 text-left">Chosen style</th>
+                  <th className="px-3 py-2 text-left">Why</th>
+                  <th className="px-3 py-2 text-left">Risk</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800 text-gray-300">
+                {[
+                  ['Create transfer', 'REST', 'Stable resource contract and HTTP semantics', 'Must handle idempotency and errors'],
+                  ['Mobile dashboard', 'GraphQL', 'One screen pulls many data shapes', 'Query cost and field-level auth'],
+                  ['Risk scoring', 'gRPC', 'Low-latency typed internal call', 'Deadlines and protobuf compatibility'],
+                  ['Settlement update', 'Webhook', 'Partner gets notified without polling', 'Retries, signatures, duplicate events'],
+                ].map((row) => (
+                  <tr key={row[0]} className="hover:bg-gray-900/40">
+                    {row.map((cell, i) => (
+                      <td key={cell} className={`px-3 py-2 align-top ${i === 1 ? 'text-yellow-200 font-semibold' : ''}`}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </Topic>
+
+      <Topic
+        icon="🧯"
+        title="Failure Contracts and Versioning"
+        scenario="A senior API design is not only the happy path. PayBank also designs how failures look and how contracts evolve without breaking old mobile apps."
+        takeaway="Show interviewers both success and failure contracts. Great APIs are predictable when things go wrong."
+      >
+        <div className="grid sm:grid-cols-2 gap-3">
+          <CodeBlock
+            title="Business error"
+            tone="red"
+            code={`HTTP/1.1 409 Conflict
+
+{
+  "error": {
+    "code": "INSUFFICIENT_FUNDS",
+    "message": "Balance is too low for this transfer.",
+    "requestId": "req_9h3k",
+    "retryable": false
+  }
+}`}
+          />
+          <CodeBlock
+            title="Idempotency conflict"
+            tone="red"
+            code={`HTTP/1.1 409 Conflict
+
+{
+  "error": {
+    "code": "IDEMPOTENCY_CONFLICT",
+    "message": "This key was already used with a different request body.",
+    "requestId": "req_2ab7"
+  }
+}`}
+          />
+          <div className="sm:col-span-2 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+            <p className="text-sm font-bold text-yellow-200 mb-2">Version migration example</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              `/v1/transfers` accepts a simple destination account id. `/v2/transfers` adds beneficiary type,
+              fraud challenge status, and richer failure reasons. PayBank keeps v1 alive for older app versions,
+              publishes a deprecation date, and monitors traffic before retiring it.
+            </p>
+          </div>
+        </div>
       </Topic>
 
       <div className="rounded-2xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 to-amber-500/5 p-5">
