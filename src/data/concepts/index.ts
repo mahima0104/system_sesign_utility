@@ -7,6 +7,8 @@ import { latencyVsThroughput } from './latency-vs-throughput';
 import { consistentHashing } from './consistent-hashing';
 import { capTheorem } from './cap-theorem';
 import { consistencyModels } from './consistency-models';
+import { clientServerArchitecture } from './client-server-architecture';
+import { monolithicArchitecture } from './monolithic-architecture';
 
 export const conceptDeepDives: ConceptDeepDive[] = [
   scalability,
@@ -17,6 +19,8 @@ export const conceptDeepDives: ConceptDeepDive[] = [
   consistentHashing,
   capTheorem,
   consistencyModels,
+  clientServerArchitecture,
+  monolithicArchitecture,
 ];
 
 export const getConceptDeepDive = (moduleId: string): ConceptDeepDive | undefined =>
