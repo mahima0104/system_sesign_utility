@@ -813,21 +813,65 @@ function Section({
               )}
 
               {name === 'Database Scaling' && (
-                <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3 flex flex-wrap gap-4 items-center">
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <span className="text-lg">📖</span>
-                    <div>
-                      <p className="font-semibold text-indigo-300 text-xs uppercase tracking-wider">Scaling Reads</p>
-                      <p className="text-[11px] text-gray-500 mt-0.5">Indexing · Query optimisation · Read replicas · Connection pooling</p>
+                <div className="space-y-3">
+                  <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3 flex flex-wrap gap-4 items-center">
+                    <div className="flex items-center gap-2 text-sm text-gray-300">
+                      <span className="text-lg">📖</span>
+                      <div>
+                        <p className="font-semibold text-indigo-300 text-xs uppercase tracking-wider">Scaling Reads</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5">Indexing · Query optimisation · Read replicas · Connection pooling</p>
+                      </div>
+                    </div>
+                    <div className="hidden sm:block w-px h-8 bg-gray-700" />
+                    <div className="flex items-center gap-2 text-sm text-gray-300">
+                      <span className="text-lg">✍️</span>
+                      <div>
+                        <p className="font-semibold text-violet-300 text-xs uppercase tracking-wider">Scaling Writes</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5">Partitioning · Sharding · Compression</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="hidden sm:block w-px h-8 bg-gray-700" />
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <span className="text-lg">✍️</span>
-                    <div>
-                      <p className="font-semibold text-violet-300 text-xs uppercase tracking-wider">Scaling Writes</p>
-                      <p className="text-[11px] text-gray-500 mt-0.5">Partitioning · Sharding · Compression</p>
-                    </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Link
+                      to="/case-study/flipkart-reads"
+                      className="block rounded-xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 via-blue-500/5 to-transparent p-4 hover:border-indigo-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🛍️</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: Flipkart Read Scaling</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
+                              Reads
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            500M SKUs, 5M QPS — indexing, query optimisation, read replicas &amp; connection pooling in one enterprise flow.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-indigo-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/case-study/swiggy-writes"
+                      className="block rounded-xl border border-violet-500/30 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-transparent p-4 hover:border-violet-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🛵</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: Swiggy Write Scaling</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-200 border border-violet-500/30">
+                              Writes
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            3M orders/day, 80TB — partitioning, sharding &amp; compression powering Swiggy's order system at scale.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-violet-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
                 </div>
               )}

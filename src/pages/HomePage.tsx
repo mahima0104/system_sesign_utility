@@ -1,61 +1,46 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { modules } from '../data/modules';
-import { getTop30Totals } from '../data/top30Concepts';
 import { useProgressStore } from '../store/useProgressStore';
 import ProgressBar from '../components/Common/ProgressBar';
-
-const top30Totals = getTop30Totals();
+import CaseStudyPanel from '../components/Home/CaseStudyPanel';
 
 const learningAreas = [
   {
     title: 'Core System Design',
-    description: 'Scalability, availability, reliability, CAP, consistency, caching, databases, and load balancing.',
+    description: 'Scalability, availability, consistency, caching, databases, and trade-offs.',
     icon: '🧠',
     accent: 'from-pink-500 to-fuchsia-400',
     to: '/modules',
   },
   {
     title: 'Interview Prep Planner',
-    description: 'A workspace to track all 30 must-know concepts — subtopics, confidence (1–5), and revision memos.',
+    description: 'Track all 30 must-know concepts with subtopics, confidence ratings, and memos.',
     icon: '🗂️',
     accent: 'from-cyan-400 to-emerald-400',
     to: '/interview-prep',
   },
   {
     title: 'Design Patterns',
-    description: 'Creational, structural, and behavioral patterns explained with examples and visuals.',
+    description: 'Creational, structural, and behavioral patterns with examples and visuals.',
     icon: '🏛️',
     accent: 'from-violet-400 to-blue-400',
     to: '/patterns',
   },
   {
-    title: 'Real-World Case Studies',
-    description: 'Kafka and Uber-style event architecture walkthroughs for production system thinking.',
-    icon: '🚀',
-    accent: 'from-yellow-300 to-orange-400',
+    title: 'Kafka Deep Dive',
+    description: 'Topics, partitions, consumer groups, retention, and exactly-once semantics.',
+    icon: '🌊',
+    accent: 'from-blue-500 to-cyan-400',
     to: '/kafka',
   },
   {
-    title: 'PayBank Banking Case Study',
-    description: 'All 8 Core Concepts applied to one UPI-style bank — interactive demos plus a design challenge.',
-    icon: '🏦',
-    accent: 'from-emerald-300 to-cyan-400',
-    to: '/case-study/paybank',
-  },
-  {
-    title: 'QuickEats Load Balancing Case Study',
-    description: 'L4 vs L7, the 5 algorithms, health checks, sticky sessions, DNS LB, anycast — all on a Friday-night food-delivery rush.',
-    icon: '🍕',
-    accent: 'from-orange-300 to-yellow-300',
-    to: '/case-study/quickeats',
-  },
-  {
-    title: 'StreamCart Architecture Case Study',
-    description: 'Client-server, monolith evolution, event-driven fan-out, CORS, serverless — all six architectural patterns in one enterprise live-commerce platform.',
-    icon: '🎬',
-    accent: 'from-purple-400 to-pink-400',
-    to: '/case-study/streamcart',
+    title: 'Progress Dashboard',
+    description: 'Your lessons, XP, quiz scores, and confidence levels in one place.',
+    icon: '📈',
+    accent: 'from-emerald-400 to-teal-400',
+    to: '/progress',
   },
 ];
 
@@ -111,7 +96,7 @@ function AnimatedLearningMap() {
       <div className="relative z-10 mt-8 rounded-xl border border-pink-500/20 bg-pink-500/10 p-4">
         <p className="text-sm font-semibold text-pink-200">Visual first, theory second</p>
         <p className="mt-1 text-xs leading-relaxed text-gray-400">
-          Follow the flow, understand the role of each component, then learn the interview trade-offs.
+          Follow the flow, understand each component, then learn the interview trade-offs.
         </p>
       </div>
     </div>
@@ -119,132 +104,186 @@ function AnimatedLearningMap() {
 }
 
 export default function HomePage() {
+  const [panelOpen, setPanelOpen] = useState(false);
   const { totalXp, completedLessons } = useProgressStore();
 
   const totalLessons = modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
   const completion = totalLessons ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
 
-  const stats = [
-    { label: 'System Design Modules', value: modules.length, icon: '📦' },
-    { label: 'Top Concepts', value: top30Totals.concepts, icon: '✨' },
-    { label: 'Lessons Complete', value: completedLessons.length, icon: '✅' },
-    { label: 'XP Earned', value: totalXp, icon: '⚡' },
-  ];
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      <section className="grid lg:grid-cols-[0.78fr_1.22fr] gap-8 items-center mb-10">
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
-          <div className="inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-1.5 text-sm font-medium text-pink-200 mb-5">
-            🎓 Visual learning for system design interviews
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
-            Learn System Design
-            <span className="block bg-gradient-to-r from-pink-300 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">
-              Visually
-            </span>
-          </h1>
-          <p className="text-lg text-gray-400 leading-relaxed max-w-2xl">
-            Interactive diagrams, real-world analogies, and hands-on demos. No jargon — just clear,
-            visual explanations anyone can understand.
-          </p>
+    <>
+      <CaseStudyPanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />
 
-          <div className="mt-7 inline-flex flex-wrap gap-3 rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-2.5 shadow-lg shadow-cyan-500/10">
-            <Link
-              to="/interview-prep"
-              className="rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 py-2 text-sm font-semibold text-gray-950 shadow-md shadow-cyan-500/30 transition-all hover:from-emerald-300 hover:to-cyan-300"
-            >
-              Open Interview Planner →
-            </Link>
-            <Link
-              to="/modules"
-              className="rounded-xl border border-blue-300/40 bg-blue-400/10 px-4 py-2 text-sm font-semibold text-blue-100 shadow-sm shadow-blue-500/10 transition-colors hover:border-blue-200 hover:bg-blue-400/15"
-            >
-              Explore Curriculum
-            </Link>
-          </div>
-        </motion.div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
-        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.45 }}>
-          <AnimatedLearningMap />
-        </motion.div>
-      </section>
-
-      <motion.section
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10"
-      >
-        {stats.map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-gray-800 bg-gray-900/70 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-2xl">{stat.icon}</span>
-              <span className="text-2xl font-bold text-white">{stat.value}</span>
+        {/* Hero */}
+        <section className="grid lg:grid-cols-[0.78fr_1.22fr] gap-8 items-center mb-10">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            <div className="inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-1.5 text-sm font-medium text-pink-200 mb-5">
+              🎓 Visual learning for system design interviews
             </div>
-            <p className="mt-2 text-xs font-medium uppercase tracking-wide text-gray-500">{stat.label}</p>
-          </div>
-        ))}
-      </motion.section>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
+              Learn System Design
+              <span className="block bg-gradient-to-r from-pink-300 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">
+                Visually
+              </span>
+            </h1>
+            <p className="text-lg text-gray-400 leading-relaxed max-w-2xl mb-7">
+              Interactive diagrams, real-world analogies, and hands-on demos. No jargon — just clear,
+              visual explanations anyone can understand.
+            </p>
 
-      <section className="grid lg:grid-cols-[0.5fr_1.5fr] gap-5 mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="rounded-xl border border-gray-800 bg-gray-900/70 p-4"
-        >
-          <p className="text-cyan-300 text-xs font-semibold mb-1.5">📈 Your learning snapshot</p>
-          <h2 className="text-lg font-bold text-white mb-2">Progress stays visible</h2>
-          <p className="text-xs text-gray-400 leading-relaxed mb-4">
-            Lessons, concept checklists, confidence levels, quiz scores, and memos stay organized.
-          </p>
-          <ProgressBar value={completion} label={`${completedLessons.length} of ${totalLessons} lessons complete`} color={completion === 100 ? 'success' : 'brand'} />
-          <Link to="/progress" className="mt-4 inline-flex text-xs font-medium text-cyan-300 hover:text-cyan-200 transition-colors">
-            View progress dashboard →
-          </Link>
-        </motion.div>
+            {/* CTA buttons */}
+            <div className="inline-flex flex-wrap gap-3 rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-2.5 shadow-lg shadow-cyan-500/10">
+              <Link
+                to="/interview-prep"
+                className="rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-4 py-2 text-sm font-semibold text-gray-950 shadow-md shadow-cyan-500/30 transition-all hover:from-emerald-300 hover:to-cyan-300"
+              >
+                Open Interview Planner →
+              </Link>
+              <Link
+                to="/modules"
+                className="rounded-xl border border-blue-300/40 bg-blue-400/10 px-4 py-2 text-sm font-semibold text-blue-100 shadow-sm shadow-blue-500/10 transition-colors hover:border-blue-200 hover:bg-blue-400/15"
+              >
+                Explore Curriculum
+              </Link>
+            </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="grid sm:grid-cols-2 gap-3"
-        >
-          {learningAreas.map((area) => (
-            <Link key={area.title} to={area.to} className="group rounded-xl border border-gray-800 bg-gray-900/70 p-4 transition-all hover:border-pink-400/50 hover:bg-gray-900">
-              <div className={`mb-3 h-1 w-16 rounded-full bg-gradient-to-r ${area.accent}`} />
+            {/* Case Study Command Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-4"
+            >
+              <button
+                onClick={() => setPanelOpen(true)}
+                className="group flex w-full items-center gap-3 rounded-xl border border-gray-700 bg-gray-900/80 px-4 py-3 text-left transition-all hover:border-cyan-500/50 hover:bg-gray-900 hover:shadow-lg hover:shadow-cyan-500/10"
+              >
+                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-yellow-400 to-orange-400 text-sm shadow-sm">
+                  🚀
+                </span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">
+                    Explore Case Studies
+                  </span>
+                  <span className="ml-2 text-xs text-gray-500">16 real-world system walkthroughs</span>
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <span className="hidden sm:inline-block rounded border border-gray-600 bg-gray-800 px-1.5 py-0.5 text-[10px] font-mono text-gray-400">
+                    Browse
+                  </span>
+                  <span className="text-gray-500 group-hover:text-cyan-400 transition-colors text-sm">→</span>
+                </div>
+              </button>
+            </motion.div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.45 }}>
+            <AnimatedLearningMap />
+          </motion.div>
+        </section>
+
+        {/* Progress + Quick Nav */}
+        <section className="grid lg:grid-cols-[0.5fr_1.5fr] gap-5 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="rounded-xl border border-gray-800 bg-gray-900/70 p-5"
+          >
+            <p className="text-cyan-300 text-xs font-semibold mb-1.5">📈 Your learning snapshot</p>
+            <h2 className="text-lg font-bold text-white mb-1">Progress</h2>
+
+            {/* Mini stats row */}
+            <div className="flex gap-4 mb-4">
+              <div>
+                <p className="text-xl font-bold text-white">{completedLessons.length}</p>
+                <p className="text-[11px] text-gray-500">Lessons done</p>
+              </div>
+              <div className="w-px bg-gray-700" />
+              <div>
+                <p className="text-xl font-bold text-white">{totalXp}</p>
+                <p className="text-[11px] text-gray-500">XP earned</p>
+              </div>
+              <div className="w-px bg-gray-700" />
+              <div>
+                <p className="text-xl font-bold text-white">{completion}%</p>
+                <p className="text-[11px] text-gray-500">Complete</p>
+              </div>
+            </div>
+
+            <ProgressBar value={completion} label={`${completedLessons.length} of ${totalLessons} lessons`} color={completion === 100 ? 'success' : 'brand'} />
+            <Link to="/progress" className="mt-4 inline-flex text-xs font-medium text-cyan-300 hover:text-cyan-200 transition-colors">
+              View full dashboard →
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
+          >
+            {learningAreas.map((area) => (
+              <Link
+                key={area.title}
+                to={area.to}
+                className="group rounded-xl border border-gray-800 bg-gray-900/70 p-4 transition-all hover:border-pink-400/50 hover:bg-gray-900"
+              >
+                <div className={`mb-3 h-1 w-12 rounded-full bg-gradient-to-r ${area.accent}`} />
+                <div className="flex items-start gap-2.5">
+                  <span className="text-xl leading-none">{area.icon}</span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-white group-hover:text-pink-200 transition-colors">{area.title}</h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-gray-400">{area.description}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+
+            {/* Case Studies shortcut card */}
+            <button
+              onClick={() => setPanelOpen(true)}
+              className="group rounded-xl border border-orange-500/20 bg-orange-500/5 p-4 text-left transition-all hover:border-orange-400/50 hover:bg-orange-500/10"
+            >
+              <div className="mb-3 h-1 w-12 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400" />
               <div className="flex items-start gap-2.5">
-                <span className="text-xl">{area.icon}</span>
+                <span className="text-xl leading-none">🚀</span>
                 <div>
-                  <h3 className="text-sm font-semibold text-white group-hover:text-pink-200 transition-colors">{area.title}</h3>
-                  <p className="mt-1.5 text-xs leading-relaxed text-gray-400">{area.description}</p>
+                  <h3 className="text-sm font-semibold text-white group-hover:text-orange-200 transition-colors">
+                    Case Studies
+                  </h3>
+                  <p className="mt-1.5 text-xs leading-relaxed text-gray-400">
+                    16 real-world walkthroughs — Uber, Flipkart, Swiggy, PayBank, and more.
+                  </p>
                 </div>
               </div>
-            </Link>
-          ))}
-        </motion.div>
-      </section>
+            </button>
+          </motion.div>
+        </section>
 
-      <motion.section
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="rounded-2xl border border-pink-500/20 bg-pink-500/10 p-6 sm:p-7"
-      >
-        <div className="grid md:grid-cols-[1fr_auto] gap-5 md:items-center">
-          <div>
-            <p className="text-pink-200 text-sm font-semibold mb-2">💡 Learning Through Analogies</p>
-            <h2 className="text-2xl font-bold text-white mb-2">Once the mental model clicks, the technical details follow naturally.</h2>
-            <p className="text-gray-300 leading-relaxed">
-              We explain ideas with simple examples first, then connect them to architecture diagrams, trade-offs, interview questions, and real production systems.
-            </p>
+        {/* Bottom CTA */}
+        <motion.section
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="rounded-2xl border border-pink-500/20 bg-pink-500/10 p-6 sm:p-7"
+        >
+          <div className="grid md:grid-cols-[1fr_auto] gap-5 md:items-center">
+            <div>
+              <p className="text-pink-200 text-sm font-semibold mb-2">💡 Learning Through Analogies</p>
+              <h2 className="text-2xl font-bold text-white mb-2">Once the mental model clicks, the technical details follow naturally.</h2>
+              <p className="text-gray-300 leading-relaxed">
+                We explain ideas with simple examples first, then connect them to architecture diagrams, trade-offs, interview questions, and real production systems.
+              </p>
+            </div>
+            <Link to="/modules" className="btn-primary whitespace-nowrap">
+              Continue Learning →
+            </Link>
           </div>
-          <Link to="/modules" className="btn-primary whitespace-nowrap">
-            Continue Learning →
-          </Link>
-        </div>
-      </motion.section>
-    </div>
+        </motion.section>
+      </div>
+    </>
   );
 }

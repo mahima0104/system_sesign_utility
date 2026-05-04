@@ -25,6 +25,8 @@ const AsynchronousCommunicationCaseStudyPage = lazy(() => import('./pages/Asynch
 const APIDesignCaseStudyPage = lazy(() => import('./pages/APIDesignCaseStudyPage'));
 const APIInfrastructureCaseStudyPage = lazy(() => import('./pages/APIInfrastructureCaseStudyPage'));
 const APISecurityCaseStudyPage = lazy(() => import('./pages/APISecurityCaseStudyPage'));
+const DBScalingReadsCaseStudyPage = lazy(() => import('./pages/DBScalingReadsCaseStudyPage'));
+const DBScalingWritesCaseStudyPage = lazy(() => import('./pages/DBScalingWritesCaseStudyPage'));
 
 function PageSpinner() {
   return (
@@ -64,6 +66,8 @@ export default function App() {
           <Route path="/case-study/api-design"  element={<Suspense fallback={<PageSpinner />}><APIDesignCaseStudyPage /></Suspense>} />
           <Route path="/case-study/api-infrastructure"  element={<Suspense fallback={<PageSpinner />}><APIInfrastructureCaseStudyPage /></Suspense>} />
           <Route path="/case-study/api-security"  element={<Suspense fallback={<PageSpinner />}><APISecurityCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/flipkart-reads"  element={<Suspense fallback={<PageSpinner />}><DBScalingReadsCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/swiggy-writes"  element={<Suspense fallback={<PageSpinner />}><DBScalingWritesCaseStudyPage /></Suspense>} />
           <Route path="/progress"              element={<ProgressPage />} />
           <Route path="*"                      element={<Navigate to="/" replace />} />
         </Route>

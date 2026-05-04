@@ -22,6 +22,31 @@ import { connectionPooling } from './connection-pooling';
 import { databaseSharding } from './database-sharding';
 import { verticalHorizontalPartitioning } from './vertical-horizontal-partitioning';
 import { databaseCompression } from './database-compression';
+// Communication Patterns
+import { longPolling } from './long-polling';
+import { websockets } from './websockets';
+import { serverSentEvents } from './server-sent-events';
+import { webhooks } from './webhooks';
+import { webrtc } from './webrtc';
+import { syncVsAsync } from './sync-vs-async';
+import { messageQueues } from './message-queues';
+import { pubSub } from './pub-sub';
+import { changeDataCapture } from './change-data-capture';
+import { deliverySemantics } from './delivery-semantics';
+import { deadLetterQueues } from './dead-letter-queues';
+// Caching
+import { caching } from './caching';
+import { whatIsCaching } from './what-is-caching';
+import { cacheAsidePattern } from './cache-aside-pattern';
+import { readThroughWriteThroughCache } from './read-through-write-through-cache';
+import { writeBehindCache } from './write-behind-cache';
+import { cachingStrategies } from './caching-strategies';
+import { cacheEvictionPolicies } from './cache-eviction-policies';
+import { contentDeliveryNetworkCdn } from './content-delivery-network-cdn';
+import { distributedCaching } from './distributed-caching';
+import { cacheInvalidation } from './cache-invalidation';
+import { cacheStampede } from './cache-stampede';
+import { cacheWarming } from './cache-warming';
 
 export const conceptDeepDives: ConceptDeepDive[] = [
   whatIsSystemDesign,
@@ -47,6 +72,31 @@ export const conceptDeepDives: ConceptDeepDive[] = [
   databaseSharding,
   verticalHorizontalPartitioning,
   databaseCompression,
+  // Communication Patterns
+  longPolling,
+  websockets,
+  serverSentEvents,
+  webhooks,
+  webrtc,
+  syncVsAsync,
+  messageQueues,
+  pubSub,
+  changeDataCapture,
+  deliverySemantics,
+  deadLetterQueues,
+  // Caching
+  caching,
+  whatIsCaching,
+  cacheAsidePattern,
+  readThroughWriteThroughCache,
+  writeBehindCache,
+  cachingStrategies,
+  cacheEvictionPolicies,
+  contentDeliveryNetworkCdn,
+  distributedCaching,
+  cacheInvalidation,
+  cacheStampede,
+  cacheWarming,
 ];
 
 export const getConceptDeepDive = (moduleId: string): ConceptDeepDive | undefined =>
