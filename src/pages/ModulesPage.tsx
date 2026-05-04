@@ -35,6 +35,173 @@ const DB_SCALING_SUBCATEGORIES: {
   },
 ];
 
+// ─── Database learning path sub-category definitions ─────────────────────────
+const DATABASE_SUBCATEGORIES: {
+  key: string;
+  label: string;
+  description: string;
+  icon: string;
+  accent: string;
+  badgeColor: string;
+  ids: string[];
+}[] = [
+  {
+    key: 'fundamentals',
+    label: 'Database Fundamentals',
+    description: 'Start here: database types, SQL vs NoSQL choices, and ACID guarantees.',
+    icon: '🧱',
+    accent: 'border-emerald-500/40 bg-emerald-500/5',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    ids: ['databases', 'database-types', 'sql-vs-nosql', 'acid-transactions'],
+  },
+  {
+    key: 'in-depth',
+    label: 'Database In Depth',
+    description: 'Go deeper into relational, document, key-value, graph, vector, and specialized databases.',
+    icon: '🔬',
+    accent: 'border-cyan-500/40 bg-cyan-500/5',
+    badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+    ids: [
+      'relational-databases',
+      'document-databases',
+      'key-value-stores',
+      'wide-column-databases',
+      'graph-databases',
+      'time-series-databases',
+      'full-text-search-engines',
+      'vector-databases',
+    ],
+  },
+];
+
+// ─── Caching learning path sub-category definitions ──────────────────────────
+const CACHING_SUBCATEGORIES: {
+  key: string;
+  label: string;
+  description: string;
+  icon: string;
+  accent: string;
+  badgeColor: string;
+  ids: string[];
+}[] = [
+  {
+    key: 'fundamentals',
+    label: 'Caching Fundamentals',
+    description: 'Start here: what caching is, common caching patterns, strategies, and eviction policies.',
+    icon: '📚',
+    accent: 'border-lime-500/40 bg-lime-500/5',
+    badgeColor: 'bg-lime-500/20 text-lime-300 border-lime-500/30',
+    ids: [
+      'caching',
+      'what-is-caching',
+      'cache-aside-pattern',
+      'read-through-vs-write-through-cache',
+      'write-behind-cache',
+      'caching-strategies',
+      'cache-eviction-policies',
+    ],
+  },
+  {
+    key: 'distributed',
+    label: 'Distributed Caching',
+    description: 'Scale caching across regions and services with CDN, distributed cache, invalidation, stampede control, and warming.',
+    icon: '🌍',
+    accent: 'border-teal-500/40 bg-teal-500/5',
+    badgeColor: 'bg-teal-500/20 text-teal-300 border-teal-500/30',
+    ids: [
+      'content-delivery-network-cdn',
+      'distributed-caching',
+      'cache-invalidation',
+      'cache-stampede',
+      'cache-warming',
+    ],
+  },
+];
+
+// ─── Communication learning path sub-category definitions ────────────────────
+const COMMUNICATION_SUBCATEGORIES: {
+  key: string;
+  label: string;
+  description: string;
+  icon: string;
+  accent: string;
+  badgeColor: string;
+  ids: string[];
+}[] = [
+  {
+    key: 'real-time',
+    label: 'Real-Time Communication',
+    description: 'Learn browser and service patterns for live updates: long polling, webhooks, SSE, WebSockets, and WebRTC.',
+    icon: '📡',
+    accent: 'border-pink-500/40 bg-pink-500/5',
+    badgeColor: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+    ids: ['long-polling', 'webhooks', 'server-sent-events', 'websockets', 'webrtc'],
+  },
+  {
+    key: 'async',
+    label: 'Asynchronous Communication',
+    description: 'Decouple services with async design, queues, pub/sub, CDC, delivery guarantees, and dead letter queues.',
+    icon: '📬',
+    accent: 'border-orange-500/40 bg-orange-500/5',
+    badgeColor: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    ids: [
+      'sync-vs-async-communication',
+      'message-queues',
+      'pub-sub',
+      'change-data-capture-cdc',
+      'delivery-semantics',
+      'dead-letter-queues',
+    ],
+  },
+];
+
+// ─── API Fundamentals learning path sub-category definitions ─────────────────
+const API_SUBCATEGORIES: {
+  key: string;
+  label: string;
+  description: string;
+  icon: string;
+  accent: string;
+  badgeColor: string;
+  ids: string[];
+}[] = [
+  {
+    key: 'design',
+    label: 'API Design',
+    description: 'Start with API basics, idempotency, data formats, REST design, architectural styles, GraphQL, and gRPC.',
+    icon: '📐',
+    accent: 'border-yellow-500/40 bg-yellow-500/5',
+    badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+    ids: [
+      'what-is-an-api',
+      'idempotency',
+      'data-formats',
+      'rest-api-design',
+      'api-architectural-styles',
+      'graphql',
+      'grpc',
+    ],
+  },
+  {
+    key: 'infrastructure',
+    label: 'API Infrastructure',
+    description: 'Protect and route production APIs with rate limiting and API gateways.',
+    icon: '🚪',
+    accent: 'border-orange-500/40 bg-orange-500/5',
+    badgeColor: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    ids: ['rate-limiting', 'api-gateways'],
+  },
+  {
+    key: 'security',
+    label: 'API Security',
+    description: 'Secure API access with authentication, authorization, sessions, tokens, JWT, SSO, and OAuth 2.0.',
+    icon: '🔐',
+    accent: 'border-red-500/40 bg-red-500/5',
+    badgeColor: 'bg-red-500/20 text-red-300 border-red-500/30',
+    ids: ['authentication-authorization', 'session-vs-token-auth', 'jwt', 'sso', 'oauth-oauth2'],
+  },
+];
+
 const SECTION_ICONS: Record<string, string> = {
   'Introduction': '🏁',
   'Core Concepts': '🧠',
@@ -254,6 +421,7 @@ function ModuleCard({
 
 function SubCategoryGroup({
   label,
+  description,
   icon,
   accent,
   badgeColor,
@@ -262,6 +430,7 @@ function SubCategoryGroup({
   defaultOpen,
 }: {
   label: string;
+  description?: string;
   icon: string;
   accent: string;
   badgeColor: string;
@@ -297,6 +466,9 @@ function SubCategoryGroup({
               </span>
             )}
           </div>
+          {description && (
+            <p className="mt-1 text-xs text-gray-400 leading-relaxed">{description}</p>
+          )}
           <div className="mt-1.5 max-w-xs">
             <ProgressBar value={pct} size="sm" showPercent={false} color={pct === 100 ? 'success' : 'brand'} />
           </div>
@@ -457,6 +629,166 @@ function Section({
                 </Link>
               )}
 
+              {name === 'API Fundamentals' && (
+                <div className="space-y-3">
+                  <div className="grid lg:grid-cols-3 gap-3">
+                    <Link
+                      to="/case-study/api-design"
+                      className="block rounded-xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 via-amber-500/5 to-transparent p-4 hover:border-yellow-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🏦</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: PayBank API design</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-200 border border-yellow-500/30">
+                              Design
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Banking API contracts using REST, GraphQL, data formats, styles, and idempotency.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-yellow-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/case-study/api-infrastructure"
+                      className="block rounded-xl border border-orange-500/30 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent p-4 hover:border-orange-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🚪</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: PayBank API edge</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-200 border border-orange-500/30">
+                              Infrastructure
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Gateway routing and rate limiting protecting enterprise banking APIs.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-orange-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/case-study/api-security"
+                      className="block rounded-xl border border-red-500/30 bg-gradient-to-br from-red-500/10 via-rose-500/5 to-transparent p-4 hover:border-red-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🔐</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: PayBank identity layer</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/20 text-red-200 border border-red-500/30">
+                              Security
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Authentication, authorization, sessions, JWT, SSO, and OAuth in one corporate login flow.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-red-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3">
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">📐</span>
+                        <div>
+                          <p className="font-semibold text-yellow-300 text-xs uppercase tracking-wider">API Design</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">What is API · Idempotency · Data formats · REST · Styles · GraphQL</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">🚪</span>
+                        <div>
+                          <p className="font-semibold text-orange-300 text-xs uppercase tracking-wider">API Infrastructure</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">Rate limiting · API gateway</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">🔐</span>
+                        <div>
+                          <p className="font-semibold text-red-300 text-xs uppercase tracking-wider">API Security</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">Authn vs authz · Sessions · JWT · SSO · OAuth 2.0</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {name === 'Communication Patterns' && (
+                <div className="space-y-3">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Link
+                      to="/case-study/realtime-communication"
+                      className="block rounded-xl border border-pink-500/30 bg-gradient-to-br from-pink-500/10 via-rose-500/5 to-transparent p-4 hover:border-pink-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">💬</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: CollabDesk live workspace</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-200 border border-pink-500/30">
+                              Real-time
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Enterprise collaboration app using long polling, webhooks, SSE, WebSockets, and WebRTC with animated flows.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-pink-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/case-study/asynchronous-communication"
+                      className="block rounded-xl border border-orange-500/30 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent p-4 hover:border-orange-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🚚</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: OrderFlow async commerce</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-200 border border-orange-500/30">
+                              Async
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Enterprise order pipeline using sync vs async, queues, pub/sub, CDC, delivery guarantees, and DLQs.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-orange-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">📡</span>
+                        <div>
+                          <p className="font-semibold text-pink-300 text-xs uppercase tracking-wider">Real-Time Communication</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">Long polling · Webhooks · Server events · WebSocket · WebRTC</p>
+                        </div>
+                      </div>
+                      <div className="hidden sm:block w-px h-8 bg-gray-700" />
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">📬</span>
+                        <div>
+                          <p className="font-semibold text-orange-300 text-xs uppercase tracking-wider">Asynchronous Communication</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">Sync vs async · Message queues · Pub/Sub · CDC · Dead letter queues</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {name === 'Load Balancing' && (
                 <Link
                   to="/case-study/quickeats"
@@ -500,7 +832,221 @@ function Section({
                 </div>
               )}
 
-              {name === 'Database Scaling' ? (
+              {name === 'Databases' && (
+                <div className="space-y-3">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Link
+                      to="/case-study/database-fundamentals"
+                      className="block rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-cyan-500/5 to-transparent p-4 hover:border-emerald-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🏦</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: PayBank database foundation</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-500/30">
+                              Fundamentals
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Enterprise banking flow covering database types, SQL vs NoSQL, and ACID decisions.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-emerald-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/case-study/database-in-depth"
+                      className="block rounded-xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 via-violet-500/5 to-transparent p-4 hover:border-cyan-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🛒</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: ShopSphere polyglot persistence</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200 border border-cyan-500/30">
+                              In depth
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Enterprise commerce architecture using relational, document, key-value, graph, vector, and search stores.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-cyan-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">🧱</span>
+                        <div>
+                          <p className="font-semibold text-emerald-300 text-xs uppercase tracking-wider">Fundamentals</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">Types · SQL vs NoSQL · ACID properties</p>
+                        </div>
+                      </div>
+                      <div className="hidden sm:block w-px h-8 bg-gray-700" />
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">🔬</span>
+                        <div>
+                          <p className="font-semibold text-cyan-300 text-xs uppercase tracking-wider">In Depth</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">Relational · Document · Key-value · Graph · Vector · Specialized</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {name === 'Caching' && (
+                <div className="space-y-3">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Link
+                      to="/case-study/caching-fundamentals"
+                      className="block rounded-xl border border-lime-500/30 bg-gradient-to-br from-lime-500/10 via-emerald-500/5 to-transparent p-4 hover:border-lime-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🛍️</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: FlashCart product page caching</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-lime-500/20 text-lime-200 border border-lime-500/30">
+                              Fundamentals
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Enterprise flash-sale flow using cache-aside, read/write-through, write-behind, strategies, and eviction choices.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-lime-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/case-study/distributed-caching"
+                      className="block rounded-xl border border-teal-500/30 bg-gradient-to-br from-teal-500/10 via-cyan-500/5 to-transparent p-4 hover:border-teal-400/60 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-2xl">🎬</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-white font-bold">Case Study: StreamNow global cache platform</h3>
+                            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-200 border border-teal-500/30">
+                              Distributed
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                            Enterprise media architecture covering CDN, distributed cache, invalidation, stampede prevention, and warming.
+                          </p>
+                          <div className="mt-2 text-xs font-medium text-teal-300">Open case study →</div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">📚</span>
+                        <div>
+                          <p className="font-semibold text-lime-300 text-xs uppercase tracking-wider">Fundamentals</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">What is caching · Cache-aside · Read/write-through · Write-behind · Strategies · Eviction</p>
+                        </div>
+                      </div>
+                      <div className="hidden sm:block w-px h-8 bg-gray-700" />
+                      <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-lg">🌍</span>
+                        <div>
+                          <p className="font-semibold text-teal-300 text-xs uppercase tracking-wider">Distributed Caching</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">CDN · Distributed architecture · Invalidation · Stampede · Warming</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {name === 'API Fundamentals' ? (
+                API_SUBCATEGORIES.map((sub) => {
+                  const subMods = sub.ids
+                    .map((id) => modules.find((m) => m.id === id))
+                    .filter(Boolean) as Module[];
+                  if (subMods.length === 0) return null;
+                  return (
+                    <SubCategoryGroup
+                      key={sub.key}
+                      label={sub.label}
+                      description={sub.description}
+                      icon={sub.icon}
+                      accent={sub.accent}
+                      badgeColor={sub.badgeColor}
+                      modules={subMods}
+                      expandedModuleIds={expandedModuleIds}
+                      defaultOpen={true}
+                    />
+                  );
+                })
+              ) : name === 'Communication Patterns' ? (
+                COMMUNICATION_SUBCATEGORIES.map((sub) => {
+                  const subMods = sub.ids
+                    .map((id) => modules.find((m) => m.id === id))
+                    .filter(Boolean) as Module[];
+                  if (subMods.length === 0) return null;
+                  return (
+                    <SubCategoryGroup
+                      key={sub.key}
+                      label={sub.label}
+                      description={sub.description}
+                      icon={sub.icon}
+                      accent={sub.accent}
+                      badgeColor={sub.badgeColor}
+                      modules={subMods}
+                      expandedModuleIds={expandedModuleIds}
+                      defaultOpen={true}
+                    />
+                  );
+                })
+              ) : name === 'Caching' ? (
+                CACHING_SUBCATEGORIES.map((sub) => {
+                  const subMods = sub.ids
+                    .map((id) => modules.find((m) => m.id === id))
+                    .filter(Boolean) as Module[];
+                  if (subMods.length === 0) return null;
+                  return (
+                    <SubCategoryGroup
+                      key={sub.key}
+                      label={sub.label}
+                      description={sub.description}
+                      icon={sub.icon}
+                      accent={sub.accent}
+                      badgeColor={sub.badgeColor}
+                      modules={subMods}
+                      expandedModuleIds={expandedModuleIds}
+                      defaultOpen={true}
+                    />
+                  );
+                })
+              ) : name === 'Databases' ? (
+                DATABASE_SUBCATEGORIES.map((sub) => {
+                  const subMods = sub.ids
+                    .map((id) => modules.find((m) => m.id === id))
+                    .filter(Boolean) as Module[];
+                  if (subMods.length === 0) return null;
+                  return (
+                    <SubCategoryGroup
+                      key={sub.key}
+                      label={sub.label}
+                      description={sub.description}
+                      icon={sub.icon}
+                      accent={sub.accent}
+                      badgeColor={sub.badgeColor}
+                      modules={subMods}
+                      expandedModuleIds={expandedModuleIds}
+                      defaultOpen={true}
+                    />
+                  );
+                })
+              ) : name === 'Database Scaling' ? (
                 // Render sub-categories for Database Scaling
                 DB_SCALING_SUBCATEGORIES.map((sub) => {
                   const subMods = sub.ids
@@ -511,6 +1057,7 @@ function Section({
                     <SubCategoryGroup
                       key={sub.key}
                       label={sub.label}
+                      description={undefined}
                       icon={sub.icon}
                       accent={sub.accent}
                       badgeColor={sub.badgeColor}

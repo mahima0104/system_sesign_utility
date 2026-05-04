@@ -140,7 +140,7 @@ function ClientServerDemo() {
   const [flow, setFlow] = useState<FlowKey>('browse');
   const [step, setStep] = useState(-1);
   const [done, setDone] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   function play(f: FlowKey) {
     clearTimeout(timerRef.current);

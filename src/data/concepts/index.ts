@@ -13,6 +13,7 @@ import { monolithicArchitecture } from './monolithic-architecture';
 import { eventDrivenArchitecture } from './event-driven-architecture';
 import { cors } from './cors';
 import { serverlessArchitecture } from './serverless-architecture';
+import { apiDeepDives } from './api-fundamentals';
 // Database Scaling
 import { databaseIndexing } from './database-indexing';
 import { queryOptimization } from './query-optimization';
@@ -37,6 +38,7 @@ export const conceptDeepDives: ConceptDeepDive[] = [
   eventDrivenArchitecture,
   cors,
   serverlessArchitecture,
+  ...apiDeepDives,
   // Database Scaling
   databaseIndexing,
   queryOptimization,

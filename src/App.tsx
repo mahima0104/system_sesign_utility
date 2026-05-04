@@ -16,6 +16,15 @@ const UberKafkaPage     = lazy(() => import('./pages/UberKafkaPage'));
 const BankingCaseStudyPage = lazy(() => import('./pages/BankingCaseStudyPage'));
 const LoadBalancingCaseStudyPage = lazy(() => import('./pages/LoadBalancingCaseStudyPage'));
 const ArchitectureCaseStudyPage = lazy(() => import('./pages/ArchitectureCaseStudyPage'));
+const DatabaseFundamentalsCaseStudyPage = lazy(() => import('./pages/DatabaseFundamentalsCaseStudyPage'));
+const DatabaseInDepthCaseStudyPage = lazy(() => import('./pages/DatabaseInDepthCaseStudyPage'));
+const CachingFundamentalsCaseStudyPage = lazy(() => import('./pages/CachingFundamentalsCaseStudyPage'));
+const DistributedCachingCaseStudyPage = lazy(() => import('./pages/DistributedCachingCaseStudyPage'));
+const RealtimeCommunicationCaseStudyPage = lazy(() => import('./pages/RealtimeCommunicationCaseStudyPage'));
+const AsynchronousCommunicationCaseStudyPage = lazy(() => import('./pages/AsynchronousCommunicationCaseStudyPage'));
+const APIDesignCaseStudyPage = lazy(() => import('./pages/APIDesignCaseStudyPage'));
+const APIInfrastructureCaseStudyPage = lazy(() => import('./pages/APIInfrastructureCaseStudyPage'));
+const APISecurityCaseStudyPage = lazy(() => import('./pages/APISecurityCaseStudyPage'));
 
 function PageSpinner() {
   return (
@@ -46,6 +55,15 @@ export default function App() {
           <Route path="/case-study/paybank"    element={<Suspense fallback={<PageSpinner />}><BankingCaseStudyPage /></Suspense>} />
           <Route path="/case-study/quickeats"    element={<Suspense fallback={<PageSpinner />}><LoadBalancingCaseStudyPage /></Suspense>} />
           <Route path="/case-study/streamcart"  element={<Suspense fallback={<PageSpinner />}><ArchitectureCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/database-fundamentals"  element={<Suspense fallback={<PageSpinner />}><DatabaseFundamentalsCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/database-in-depth"  element={<Suspense fallback={<PageSpinner />}><DatabaseInDepthCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/caching-fundamentals"  element={<Suspense fallback={<PageSpinner />}><CachingFundamentalsCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/distributed-caching"  element={<Suspense fallback={<PageSpinner />}><DistributedCachingCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/realtime-communication"  element={<Suspense fallback={<PageSpinner />}><RealtimeCommunicationCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/asynchronous-communication"  element={<Suspense fallback={<PageSpinner />}><AsynchronousCommunicationCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/api-design"  element={<Suspense fallback={<PageSpinner />}><APIDesignCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/api-infrastructure"  element={<Suspense fallback={<PageSpinner />}><APIInfrastructureCaseStudyPage /></Suspense>} />
+          <Route path="/case-study/api-security"  element={<Suspense fallback={<PageSpinner />}><APISecurityCaseStudyPage /></Suspense>} />
           <Route path="/progress"              element={<ProgressPage />} />
           <Route path="*"                      element={<Navigate to="/" replace />} />
         </Route>
