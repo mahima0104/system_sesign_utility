@@ -17,6 +17,7 @@ const navLinks = [
   { to: '/modules', label: 'Modules' },
   { to: '/interview-prep', label: 'Interview Prep' },
   { to: '/patterns', label: 'Patterns' },
+  { to: '/solid', label: 'SOLID' },
   { to: '/kafka', label: 'Kafka' },
   { to: '/progress', label: 'Progress' },
 ];

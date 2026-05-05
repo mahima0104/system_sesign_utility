@@ -29,6 +29,13 @@ const learningAreas = [
     to: '/patterns',
   },
   {
+    title: 'SOLID Principles',
+    description: 'Master the 5 OOP principles that every senior engineer interview tests — with real enterprise code.',
+    icon: '🔩',
+    accent: 'from-orange-400 to-pink-400',
+    to: '/solid',
+  },
+  {
     title: 'Kafka Deep Dive',
     description: 'Topics, partitions, consumer groups, retention, and exactly-once semantics.',
     icon: '🌊',
