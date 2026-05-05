@@ -13,7 +13,7 @@ function Badge({ label, color }: { label: string; color: string }) {
   );
 }
 
-function CodeBlock({ code, language = 'typescript' }: { code: string; language?: string }) {
+function CodeBlock({ code, language = 'java' }: { code: string; language?: string }) {
   const [copied, setCopied] = useState(false);
   function copy() {
     navigator.clipboard.writeText(code);
@@ -158,77 +158,86 @@ function Pill({ label, tone }: { label: string; tone: 'green' | 'red' | 'blue' |
 // ─────────────────────────────────────────────────────────────────────────────
 
 const srpBad = `// ❌ BAD — OrderService does 5 different jobs
-class OrderService {
-  createOrder(data: OrderData) {
-    // validate input
-    if (!data.userId || !data.items.length) throw new Error('Invalid');
+public class OrderService {
+    public Order createOrder(OrderData data) {
+        // 1. validate input
+        if (data.getUserId() == null || data.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Invalid order data");
+        }
 
-    // save to database
-    const order = db.orders.insert({ ...data, status: 'pending' });
+        // 2. save to database
+        Order order = orderRepository.insert(data);
 
-    // send confirmation email
-    emailClient.send({
-      to: data.userEmail,
-      subject: 'Order Confirmed',
-      body: \`Your order #\${order.id} is confirmed.\`,
-    });
+        // 3. send confirmation email
+        emailClient.send(new Email()
+            .to(data.getUserEmail())
+            .subject("Order Confirmed")
+            .body("Your order #" + order.getId() + " is confirmed."));
 
-    // publish event to Kafka
-    kafka.produce('order.created', { orderId: order.id });
+        // 4. publish event to Kafka
+        kafkaProducer.send("order.created", new OrderEvent(order.getId()));
 
-    // calculate and store analytics
-    analytics.track('order_created', { value: data.total });
+        // 5. track analytics
+        analyticsService.track("order_created", Map.of("value", data.getTotal()));
 
-    return order;
-  }
+        return order;
+    }
 }
 // One change to emailing breaks the whole OrderService.
 // Unit testing requires mocking DB + email + Kafka + analytics.`;
 
 const srpGood = `// ✅ GOOD — Each class has one reason to change
-class OrderValidator {
-  validate(data: OrderData): void {
-    if (!data.userId || !data.items.length)
-      throw new ValidationError('Invalid order data');
-  }
+public class OrderValidator {
+    public void validate(OrderData data) {
+        if (data.getUserId() == null || data.getItems().isEmpty()) {
+            throw new ValidationException("Invalid order data");
+        }
+    }
 }
 
-class OrderRepository {
-  save(data: OrderData): Order {
-    return db.orders.insert({ ...data, status: 'pending' });
-  }
+public class OrderRepository {
+    public Order save(OrderData data) {
+        return db.insert(data.withStatus("pending"));
+    }
 }
 
-class OrderNotifier {
-  notifyCreated(order: Order, email: string): void {
-    emailClient.send({ to: email, subject: 'Order Confirmed', ... });
-  }
+public class OrderNotifier {
+    public void notifyCreated(Order order, String email) {
+        emailClient.send(new Email().to(email).subject("Order Confirmed"));
+    }
 }
 
-class OrderEventPublisher {
-  publish(order: Order): void {
-    kafka.produce('order.created', { orderId: order.id });
-  }
+public class OrderEventPublisher {
+    public void publish(Order order) {
+        kafkaProducer.send("order.created", new OrderEvent(order.getId()));
+    }
 }
 
-// Orchestrator (thin — just coordinates)
-class OrderService {
-  constructor(
-    private validator: OrderValidator,
-    private repo: OrderRepository,
-    private notifier: OrderNotifier,
-    private publisher: OrderEventPublisher,
-  ) {}
+// Orchestrator — thin, just coordinates
+@Service
+public class OrderService {
+    private final OrderValidator validator;
+    private final OrderRepository repo;
+    private final OrderNotifier notifier;
+    private final OrderEventPublisher publisher;
 
-  createOrder(data: OrderData, userEmail: string): Order {
-    this.validator.validate(data);
-    const order = this.repo.save(data);
-    this.notifier.notifyCreated(order, userEmail);
-    this.publisher.publish(order);
-    return order;
-  }
+    public OrderService(OrderValidator validator, OrderRepository repo,
+                        OrderNotifier notifier, OrderEventPublisher publisher) {
+        this.validator = validator;
+        this.repo      = repo;
+        this.notifier  = notifier;
+        this.publisher = publisher;
+    }
+
+    public Order createOrder(OrderData data) {
+        validator.validate(data);
+        Order order = repo.save(data);
+        notifier.notifyCreated(order, data.getUserEmail());
+        publisher.publish(order);
+        return order;
+    }
 }
-// Each class tested in isolation. EmailService change → ONLY OrderNotifier changes.`;
+// Each class tested in isolation. Email change → ONLY OrderNotifier changes.`;
 
 function SRPDemo() {
   const [view, setView] = useState<'bad' | 'good'>('bad');
@@ -304,57 +313,70 @@ function SRPDemo() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ocpBad = `// ❌ BAD — Adding a new payment method means editing existing code
-class PaymentProcessor {
-  process(order: Order, method: string): void {
-    if (method === 'credit_card') {
-      stripeClient.charge(order.total, order.cardToken);
-    } else if (method === 'upi') {
-      razorpay.initiateUPI(order.total, order.upiId);
-    } else if (method === 'wallet') {
-      paytm.deductWallet(order.userId, order.total);
+public class PaymentProcessor {
+    public void process(Order order, String method) {
+        if ("credit_card".equals(method)) {
+            stripeClient.charge(order.getTotal(), order.getCardToken());
+        } else if ("upi".equals(method)) {
+            razorpay.initiateUPI(order.getTotal(), order.getUpiId());
+        } else if ("wallet".equals(method)) {
+            paytm.deductWallet(order.getUserId(), order.getTotal());
+        }
+        // Adding PayPal means modifying this class.
+        // Every addition risks breaking existing payment paths.
+        // This file becomes a "mega-switch" over time.
     }
-    // Adding PayPal means modifying this class.
-    // Every addition risks breaking existing payment paths.
-    // This file becomes a "mega-switch" over time.
-  }
 }`;
 
 const ocpGood = `// ✅ GOOD — Open for extension, closed for modification
-interface PaymentStrategy {
-  process(order: Order): Promise<PaymentResult>;
-  supports(method: string): boolean;
+public interface PaymentStrategy {
+    PaymentResult process(Order order);
+    boolean supports(String method);
 }
 
-class StripeStrategy implements PaymentStrategy {
-  supports(method: string) { return method === 'credit_card'; }
-  async process(order: Order) {
-    return stripeClient.charge(order.total, order.cardToken);
-  }
+public class StripeStrategy implements PaymentStrategy {
+    @Override
+    public boolean supports(String method) { return "credit_card".equals(method); }
+    @Override
+    public PaymentResult process(Order order) {
+        return stripeClient.charge(order.getTotal(), order.getCardToken());
+    }
 }
 
-class UPIStrategy implements PaymentStrategy {
-  supports(method: string) { return method === 'upi'; }
-  async process(order: Order) {
-    return razorpay.initiateUPI(order.total, order.upiId);
-  }
+public class UPIStrategy implements PaymentStrategy {
+    @Override
+    public boolean supports(String method) { return "upi".equals(method); }
+    @Override
+    public PaymentResult process(Order order) {
+        return razorpay.initiateUPI(order.getTotal(), order.getUpiId());
+    }
 }
 
 // Adding PayPal: create new class, register it — existing code untouched
-class PayPalStrategy implements PaymentStrategy {
-  supports(method: string) { return method === 'paypal'; }
-  async process(order: Order) {
-    return paypalClient.execute(order.total, order.paypalToken);
-  }
+public class PayPalStrategy implements PaymentStrategy {
+    @Override
+    public boolean supports(String method) { return "paypal".equals(method); }
+    @Override
+    public PaymentResult process(Order order) {
+        return paypalClient.execute(order.getTotal(), order.getPaypalToken());
+    }
 }
 
-class PaymentProcessor {
-  constructor(private strategies: PaymentStrategy[]) {}
+public class PaymentProcessor {
+    private final List<PaymentStrategy> strategies;
 
-  async process(order: Order, method: string): Promise<PaymentResult> {
-    const strategy = this.strategies.find(s => s.supports(method));
-    if (!strategy) throw new Error(\`Unsupported payment method: \${method}\`);
-    return strategy.process(order);
-  }
+    public PaymentProcessor(List<PaymentStrategy> strategies) {
+        this.strategies = strategies;
+    }
+
+    public PaymentResult process(Order order, String method) {
+        return strategies.stream()
+            .filter(s -> s.supports(method))
+            .findFirst()
+            .orElseThrow(() ->
+                new IllegalArgumentException("Unsupported: " + method))
+            .process(order);
+    }
 }`;
 
 const ocpMethods = ['credit_card', 'upi', 'wallet', 'paypal', 'crypto'];
@@ -433,66 +455,77 @@ function OCPDemo() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const lspBad = `// ❌ BAD — Square violates Rectangle's contract
-class Rectangle {
-  constructor(protected width: number, protected height: number) {}
-  setWidth(w: number)  { this.width = w; }
-  setHeight(h: number) { this.height = h; }
-  area(): number { return this.width * this.height; }
+public class Rectangle {
+    protected int width;
+    protected int height;
+
+    public void setWidth(int w)  { this.width = w; }
+    public void setHeight(int h) { this.height = h; }
+    public int area() { return width * height; }
 }
 
-class Square extends Rectangle {
-  // Square MUST keep width === height — overrides parent contract
-  setWidth(w: number)  { this.width = w;  this.height = w; }
-  setHeight(h: number) { this.width = h;  this.height = h; }
+public class Square extends Rectangle {
+    // Square MUST keep width == height — overrides parent contract
+    @Override
+    public void setWidth(int w)  { this.width = w;  this.height = w; }
+    @Override
+    public void setHeight(int h) { this.width = h;  this.height = h; }
 }
 
 // Client code — breaks with Square substituted for Rectangle
-function resize(r: Rectangle): void {
-  r.setWidth(5);
-  r.setHeight(10);
-  console.log(r.area()); // Expects 50. Gets 100 with Square!
+public static void resize(Rectangle r) {
+    r.setWidth(5);
+    r.setHeight(10);
+    System.out.println(r.area()); // Expects 50. Gets 100 with Square!
 }`;
 
 const lspGood = `// ✅ GOOD — Separate abstractions, no broken substitution
-interface Shape {
-  area(): number;
+public interface Shape {
+    int area();
 }
 
-class Rectangle implements Shape {
-  constructor(private width: number, private height: number) {}
-  area() { return this.width * this.height; }
+public class Rectangle implements Shape {
+    private final int width, height;
+    public Rectangle(int width, int height) {
+        this.width = width; this.height = height;
+    }
+    @Override public int area() { return width * height; }
 }
 
-class Square implements Shape {
-  constructor(private side: number) {}
-  area() { return this.side * this.side; }
+public class Square implements Shape {
+    private final int side;
+    public Square(int side) { this.side = side; }
+    @Override public int area() { return side * side; }
 }
 
 // Real-world: NotificationService example
-abstract class NotificationChannel {
-  abstract send(message: string, recipient: string): Promise<void>;
-  abstract supportsRichText(): boolean;
+public abstract class NotificationChannel {
+    public abstract void send(String message, String recipient);
+    public abstract boolean supportsRichText();
 }
 
-class EmailChannel extends NotificationChannel {
-  async send(msg: string, to: string) { await sendEmail(to, msg); }
-  supportsRichText() { return true; }
+public class EmailChannel extends NotificationChannel {
+    @Override public void send(String msg, String to) { emailService.send(to, msg); }
+    @Override public boolean supportsRichText() { return true; }
 }
 
-class SMSChannel extends NotificationChannel {
-  async send(msg: string, to: string) { await sendSMS(to, msg.slice(0, 160)); }
-  supportsRichText() { return false; }  // honest about limitations
+public class SMSChannel extends NotificationChannel {
+    @Override
+    public void send(String msg, String to) {
+        smsGateway.send(to, msg.substring(0, Math.min(msg.length(), 160)));
+    }
+    @Override public boolean supportsRichText() { return false; } // honest
 }
 
-class PushChannel extends NotificationChannel {
-  async send(msg: string, to: string) { await pushNotification(to, msg); }
-  supportsRichText() { return true; }
+public class PushChannel extends NotificationChannel {
+    @Override public void send(String msg, String to) { pushService.notify(to, msg); }
+    @Override public boolean supportsRichText() { return true; }
 }
 
 // Any NotificationChannel can be substituted without surprising the caller
-async function notify(channel: NotificationChannel, msg: string, to: string) {
-  const text = channel.supportsRichText() ? msg : stripHtml(msg);
-  await channel.send(text, to);
+public void notify(NotificationChannel channel, String msg, String to) {
+    String text = channel.supportsRichText() ? msg : stripHtml(msg);
+    channel.send(text, to);
 }`;
 
 const lspChannels = [
@@ -567,77 +600,88 @@ function LSPDemo() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ispBad = `// ❌ BAD — Fat interface forces unrelated implementations
-interface Worker {
-  work(): void;
-  eat(): void;
-  sleep(): void;
-  attendMeeting(): void;
-  submitTimesheet(): void;
+public interface Worker {
+    void work();
+    void eat();
+    void sleep();
+    void attendMeeting();
+    void submitTimesheet();
 }
 
 // RobotWorker is forced to implement human-only methods
-class RobotWorker implements Worker {
-  work() { /* actual work */ }
-  eat()  { throw new Error("Robots don't eat!"); }   // ← forced stub
-  sleep(){ throw new Error("Robots don't sleep!"); }  // ← forced stub
-  attendMeeting() { /* OK */ }
-  submitTimesheet() { /* OK */ }
+public class RobotWorker implements Worker {
+    @Override public void work() { /* actual work */ }
+    @Override public void eat()  {
+        throw new UnsupportedOperationException("Robots don't eat!");   // forced stub
+    }
+    @Override public void sleep() {
+        throw new UnsupportedOperationException("Robots don't sleep!"); // forced stub
+    }
+    @Override public void attendMeeting()  { /* OK */ }
+    @Override public void submitTimesheet() { /* OK */ }
 }
 
 // Real-world equivalent — a fat StorageService interface
-interface StorageService {
-  upload(file: Buffer): Promise<string>;
-  download(key: string): Promise<Buffer>;
-  delete(key: string): Promise<void>;
-  generatePresignedUrl(key: string, expiry: number): Promise<string>;
-  replicateToRegion(key: string, region: string): Promise<void>;
-  runVirusScan(key: string): Promise<boolean>;
-  generateThumbnail(key: string): Promise<string>;
+public interface StorageService {
+    String upload(byte[] file) throws IOException;
+    byte[] download(String key) throws IOException;
+    void delete(String key) throws IOException;
+    String generatePresignedUrl(String key, int expirySeconds) throws IOException;
+    void replicateToRegion(String key, String region) throws IOException;
+    boolean runVirusScan(String key) throws IOException;
+    String generateThumbnail(String key) throws IOException;
 }
 // InMemoryStorageService (for tests) must implement ALL 7 methods.`;
 
 const ispGood = `// ✅ GOOD — Segregated interfaces, implement only what you need
-interface Uploadable {
-  upload(file: Buffer): Promise<string>;
+public interface Uploadable {
+    String upload(byte[] file) throws IOException;
 }
 
-interface Downloadable {
-  download(key: string): Promise<Buffer>;
+public interface Downloadable {
+    byte[] download(String key) throws IOException;
 }
 
-interface Deletable {
-  delete(key: string): Promise<void>;
+public interface Deletable {
+    void delete(String key) throws IOException;
 }
 
-interface PresignedUrlable {
-  generatePresignedUrl(key: string, expiry: number): Promise<string>;
+public interface PresignedUrlable {
+    String generatePresignedUrl(String key, int expirySeconds) throws IOException;
 }
 
 // S3StorageService — full-featured: implements all
-class S3StorageService implements Uploadable, Downloadable, Deletable, PresignedUrlable {
-  async upload(file: Buffer) { return s3.putObject(file); }
-  async download(key: string) { return s3.getObject(key); }
-  async delete(key: string) { await s3.deleteObject(key); }
-  async generatePresignedUrl(key: string, expiry: number) {
-    return s3.getSignedUrl({ Key: key, Expires: expiry });
-  }
+public class S3StorageService
+        implements Uploadable, Downloadable, Deletable, PresignedUrlable {
+    @Override public String upload(byte[] file) { return s3.putObject(file); }
+    @Override public byte[] download(String key) { return s3.getObject(key); }
+    @Override public void delete(String key) { s3.deleteObject(key); }
+    @Override public String generatePresignedUrl(String key, int expiry) {
+        return s3.getSignedUrl(key, expiry);
+    }
 }
 
 // InMemoryStorageService — for tests: only what tests need
-class InMemoryStorageService implements Uploadable, Downloadable {
-  private store = new Map<string, Buffer>();
-  async upload(file: Buffer) {
-    const key = crypto.randomUUID();
-    this.store.set(key, file);
-    return key;
-  }
-  async download(key: string) { return this.store.get(key)!; }
+public class InMemoryStorageService implements Uploadable, Downloadable {
+    private final Map<String, byte[]> store = new HashMap<>();
+
+    @Override
+    public String upload(byte[] file) {
+        String key = UUID.randomUUID().toString();
+        store.put(key, file);
+        return key;
+    }
+
+    @Override
+    public byte[] download(String key) { return store.get(key); }
 }
 
-// ReadOnlyStorageService — public CDN access, no write/delete
-class CDNStorageService implements Downloadable, PresignedUrlable {
-  async download(key: string) { return cdnClient.fetch(key); }
-  async generatePresignedUrl(key: string, expiry: number) { return cdn.sign(key, expiry); }
+// CDNStorageService — public read-only access, no write/delete
+public class CDNStorageService implements Downloadable, PresignedUrlable {
+    @Override public byte[] download(String key) { return cdnClient.fetch(key); }
+    @Override public String generatePresignedUrl(String key, int expiry) {
+        return cdn.sign(key, expiry);
+    }
 }`;
 
 const ispServices = [
@@ -732,69 +776,74 @@ function ISPDemo() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const dipBad = `// ❌ BAD — High-level module directly depends on low-level module
-class UserService {
-  // Hard dependency on MySQL — cannot swap for Postgres or test without a DB
-  private db = new MySQLConnection('mysql://prod-host:3306/users');
-  private email = new SendGridClient(process.env.SENDGRID_KEY!);
-  private logger = new WinstonLogger({ level: 'info' });
+public class UserService {
+    // Hard dependency on MySQL — cannot swap for Postgres or test without a DB
+    private final MySQLConnection db =
+        new MySQLConnection("jdbc:mysql://prod-host:3306/users");
+    private final SendGridClient email =
+        new SendGridClient(System.getenv("SENDGRID_KEY"));
+    private final WinstonLogger logger = new WinstonLogger("info");
 
-  async registerUser(email: string, password: string): Promise<User> {
-    this.logger.info(\`Registering \${email}\`);
-    const user = await this.db.query(
-      'INSERT INTO users (email, hash) VALUES (?, ?)',
-      [email, bcrypt.hashSync(password, 10)]
-    );
-    await this.email.send({ to: email, subject: 'Welcome!' });
-    return user;
-  }
+    public User registerUser(String emailAddr, String password) {
+        logger.info("Registering " + emailAddr);
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt(10));
+        User user = db.executeQuery(
+            "INSERT INTO users (email, hash) VALUES (?, ?)", emailAddr, hash);
+        email.send(new Email().to(emailAddr).subject("Welcome!"));
+        return user;
+    }
 }
-// To test: you MUST have a running MySQL + SendGrid + a logger.
+// To test: you MUST have a running MySQL + SendGrid + logger.
 // To swap MySQL for PostgreSQL: edit UserService (violates OCP too).`;
 
 const dipGood = `// ✅ GOOD — Depend on abstractions, not concretions
-interface UserRepository {
-  save(email: string, passwordHash: string): Promise<User>;
-  findByEmail(email: string): Promise<User | null>;
+public interface UserRepository {
+    User save(String email, String passwordHash);
+    Optional<User> findByEmail(String email);
 }
 
-interface EmailService {
-  sendWelcome(email: string): Promise<void>;
+public interface EmailService {
+    void sendWelcome(String email);
 }
 
-interface Logger {
-  info(message: string): void;
-  error(message: string, err?: unknown): void;
+public interface Logger {
+    void info(String message);
+    void error(String message, Throwable err);
 }
 
 // High-level module — depends on abstractions only
-class UserService {
-  constructor(
-    private repo: UserRepository,    // injected
-    private email: EmailService,     // injected
-    private logger: Logger,          // injected
-  ) {}
+@Service
+public class UserService {
+    private final UserRepository repo;
+    private final EmailService emailService;
+    private final Logger logger;
 
-  async registerUser(emailAddr: string, password: string): Promise<User> {
-    this.logger.info(\`Registering \${emailAddr}\`);
-    const hash = await bcrypt.hash(password, 10);
-    const user = await this.repo.save(emailAddr, hash);
-    await this.email.sendWelcome(emailAddr);
-    return user;
-  }
+    @Autowired
+    public UserService(UserRepository repo, EmailService emailService, Logger logger) {
+        this.repo         = repo;
+        this.emailService = emailService;
+        this.logger       = logger;
+    }
+
+    public User registerUser(String email, String password) {
+        logger.info("Registering " + email);
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt(10));
+        User user = repo.save(email, hash);
+        emailService.sendWelcome(email);
+        return user;
+    }
 }
 
-// Production wiring (IoC container / main.ts)
-const userService = new UserService(
-  new PostgreSQLUserRepository(pgPool),
-  new SendGridEmailService(sgKey),
-  new WinstonLogger(),
-);
+// Production wiring — Spring auto-wires these beans
+// @Bean PostgreSQLUserRepository implements UserRepository → injected
+// @Bean SendGridEmailService    implements EmailService    → injected
+// @Bean Slf4jLogger             implements Logger          → injected
 
-// Test wiring — no real DB, no real email
-const testService = new UserService(
-  new InMemoryUserRepository(),
-  new MockEmailService(),
-  new ConsoleLogger(),
+// Test wiring — no real DB, no real email needed
+UserService testService = new UserService(
+    new InMemoryUserRepository(),
+    new MockEmailService(),
+    new ConsoleLogger()
 );`;
 
 const dipEnvs = [
