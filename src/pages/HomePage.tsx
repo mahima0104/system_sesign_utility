@@ -36,6 +36,13 @@ const learningAreas = [
     to: '/solid',
   },
   {
+    title: 'Mock Interview: URL Shortener',
+    description: 'Full 45-min FAANG mock — requirements, estimation, architecture, Base62 algorithm, scaling. Java code included.',
+    icon: '🎯',
+    accent: 'from-violet-400 to-pink-400',
+    to: '/mock/url-shortener',
+  },
+  {
     title: 'Kafka Deep Dive',
     description: 'Topics, partitions, consumer groups, retention, and exactly-once semantics.',
     icon: '🌊',

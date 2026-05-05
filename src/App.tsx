@@ -28,6 +28,7 @@ const APISecurityCaseStudyPage = lazy(() => import('./pages/APISecurityCaseStudy
 const DBScalingReadsCaseStudyPage = lazy(() => import('./pages/DBScalingReadsCaseStudyPage'));
 const DBScalingWritesCaseStudyPage = lazy(() => import('./pages/DBScalingWritesCaseStudyPage'));
 const SolidPrinciplesPage = lazy(() => import('./pages/SolidPrinciplesPage'));
+const UrlShortenerPage    = lazy(() => import('./pages/UrlShortenerPage'));
 
 function PageSpinner() {
   return (
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/case-study/flipkart-reads"  element={<Suspense fallback={<PageSpinner />}><DBScalingReadsCaseStudyPage /></Suspense>} />
           <Route path="/case-study/swiggy-writes"  element={<Suspense fallback={<PageSpinner />}><DBScalingWritesCaseStudyPage /></Suspense>} />
           <Route path="/solid"                 element={<Suspense fallback={<PageSpinner />}><SolidPrinciplesPage /></Suspense>} />
+          <Route path="/mock/url-shortener"   element={<Suspense fallback={<PageSpinner />}><UrlShortenerPage /></Suspense>} />
           <Route path="/progress"              element={<ProgressPage />} />
           <Route path="*"                      element={<Navigate to="/" replace />} />
         </Route>
