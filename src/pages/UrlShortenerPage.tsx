@@ -1123,30 +1123,30 @@ export default function UrlShortenerPage() {
       >
         <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-4">45-minute interview breakdown</p>
         <div className="flex flex-col sm:flex-row gap-2">
-          {QUESTIONS.map((q, i) => (
+          {QUESTIONS.map((qt, i) => (
             <button
-              key={q.id}
-              onClick={() => { setTab('mock'); goTo(q.id); }}
+              key={qt.id}
+              onClick={() => { setTab('mock'); goTo(qt.id); }}
               className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all hover:brightness-110 ${
-                activeQ === q.id && tab === 'mock'
-                  ? q.badge
+                activeQ === qt.id && tab === 'mock'
+                  ? qt.badge
                   : 'border-gray-800 bg-gray-900/50 text-gray-400'
               }`}
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-black text-white ${q.dot}`}>
+                <span className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-black text-white ${qt.dot}`}>
                   {i + 1}
                 </span>
-                <span className="text-[10px] font-semibold uppercase tracking-wide">{q.time}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide">{qt.time}</span>
               </div>
-              <p className="text-xs font-semibold leading-snug">{q.stage}</p>
+              <p className="text-xs font-semibold leading-snug">{qt.stage}</p>
             </button>
           ))}
         </div>
       </motion.div>
 
       {/* ── Main tabs ─────────────────────────────────────────────────────── */}
-      <div className="flex gap-1 border border-gray-800 rounded-xl p-1 bg-gray-900 w-fit">
+      <div className="flex gap-1 border border-gray-800 rounded-xl p-1 bg-gray-900 overflow-x-auto">
         {([
           { id: 'mock', label: '🎯 Mock Interview' },
           { id: 'code', label: '💻 Java Code' },
@@ -1155,7 +1155,7 @@ export default function UrlShortenerPage() {
           <button
             key={t.id}
             onClick={() => { setTab(t.id); ping(); }}
-            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
               tab === t.id ? 'bg-brand-500 text-white shadow' : 'text-gray-400 hover:text-gray-200'
             }`}
           >
