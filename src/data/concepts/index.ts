@@ -14,6 +14,17 @@ import { eventDrivenArchitecture } from './event-driven-architecture';
 import { cors } from './cors';
 import { serverlessArchitecture } from './serverless-architecture';
 import { apiDeepDives } from './api-fundamentals';
+// Database Types
+import { databaseTypes } from './database-types';
+import { databases } from './databases';
+import { sqlVsNoSQL } from './sql-vs-nosql';
+import { relationalDatabases } from './relational-databases';
+import { documentDatabases } from './document-databases';
+import { keyValueStores } from './key-value-stores';
+import { wideColumnDatabases } from './wide-column-databases';
+import { graphDatabases } from './graph-databases';
+import { timeSeriesDatabases } from './time-series-databases';
+import { vectorDatabases } from './vector-databases';
 // Database Scaling
 import { databaseIndexing } from './database-indexing';
 import { queryOptimization } from './query-optimization';
@@ -64,6 +75,17 @@ export const conceptDeepDives: ConceptDeepDive[] = [
   cors,
   serverlessArchitecture,
   ...apiDeepDives,
+  // Database Types
+  databaseTypes,
+  databases,
+  sqlVsNoSQL,
+  relationalDatabases,
+  documentDatabases,
+  keyValueStores,
+  wideColumnDatabases,
+  graphDatabases,
+  timeSeriesDatabases,
+  vectorDatabases,
   // Database Scaling
   databaseIndexing,
   queryOptimization,
