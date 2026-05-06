@@ -19,7 +19,8 @@ const navLinks = [
   { to: '/patterns', label: 'Patterns' },
   { to: '/solid', label: 'SOLID' },
   { to: '/kafka', label: 'Kafka' },
-  { to: '/mock/url-shortener', label: 'Mock Interview' },
+  { to: '/mock/url-shortener', label: 'Mock: URL' },
+  { to: '/mock/lru-cache', label: 'Mock: LRU' },
   { to: '/progress', label: 'Progress' },
 ];
 

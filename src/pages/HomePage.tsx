@@ -43,6 +43,13 @@ const learningAreas = [
     to: '/mock/url-shortener',
   },
   {
+    title: 'Mock Interview: LRU Cache',
+    description: 'O(1) get/put, HashMap + DLL, thread safety, Redis distributed scale. 5 progressive questions with interactive visualizer.',
+    icon: '📦',
+    accent: 'from-emerald-400 to-cyan-400',
+    to: '/mock/lru-cache',
+  },
+  {
     title: 'Kafka Deep Dive',
     description: 'Topics, partitions, consumer groups, retention, and exactly-once semantics.',
     icon: '🌊',

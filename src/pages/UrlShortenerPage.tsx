@@ -3,49 +3,114 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Sound effects — Web Audio API, no external files needed
+// Interview voice — Web Speech API (real TTS, no external files)
+// Interviewer gets a deeper/UK voice; candidate gets a clearer/US voice
 // ─────────────────────────────────────────────────────────────────────────────
-function useSounds(on: boolean) {
-  const acRef = useRef<AudioContext | null>(null);
+// Interview voices — Web Speech API
+//   Interviewer : authoritative US/UK male voice
+//   Candidate   : Indian English — clear, soft, measured pace
+// ─────────────────────────────────────────────────────────────────────────────
+type SpeakingRole = 'interviewer' | 'candidate' | null;
 
-  function getAC(): AudioContext | null {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!acRef.current) acRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      return acRef.current;
-    } catch { return null; }
+function useInterviewVoices() {
+  const [enabled, setEnabled] = useState(false);
+  const [speaking, setSpeaking] = useState<SpeakingRole>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  useEffect(() => {
+    if (!window.speechSynthesis) return;
+    function load() { setVoices(window.speechSynthesis.getVoices()); }
+    load();
+    window.speechSynthesis.onvoiceschanged = load;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
+
+  // Search by name substring first, then fall back to language code
+  function pick(namePrefs: string[], langCodes: string[]): SpeechSynthesisVoice | null {
+    for (const p of namePrefs) {
+      const v = voices.find(v => v.name.toLowerCase().includes(p.toLowerCase()));
+      if (v) return v;
+    }
+    for (const lang of langCodes) {
+      const v = voices.find(v => v.lang === lang || v.lang.startsWith(lang));
+      if (v) return v;
+    }
+    return voices.find(v => v.lang.startsWith('en')) ?? null;
   }
 
-  function ping() {
-    if (!on) return;
-    const ac = getAC(); if (!ac) return;
-    try {
-      const o = ac.createOscillator(), g = ac.createGain();
-      o.connect(g); g.connect(ac.destination);
-      o.frequency.value = 880; o.type = 'sine';
-      g.gain.setValueAtTime(0.07, ac.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.28);
-      o.start(); o.stop(ac.currentTime + 0.28);
-    } catch { /**/ }
+  function makeUtterance(text: string, role: 'interviewer' | 'candidate'): SpeechSynthesisUtterance {
+    const u = new SpeechSynthesisUtterance(text);
+
+    if (role === 'interviewer') {
+      // Authoritative, measured — US/UK male
+      u.voice  = pick(
+        ['Google UK English Male', 'Daniel', 'Microsoft David', 'Microsoft Mark', 'Alex', 'Fred'],
+        ['en-GB', 'en-US']
+      );
+      u.pitch  = 0.80;   // deeper
+      u.rate   = 0.82;   // deliberate pace
+      u.volume = 1.0;
+    } else {
+      // Indian English — clear, soft, slightly slower for natural feel
+      // Rishi  = macOS Indian English male
+      // Neerja = macOS Indian English female (older macOS)
+      // Veena  = macOS Indian Hindi-English
+      // Microsoft Heera / Ravi = Windows Indian English
+      // Google हिन्दी / en-IN voices = Chrome on Android/Linux
+      u.voice  = pick(
+        ['Rishi', 'Neerja', 'Veena', 'Microsoft Heera', 'Microsoft Ravi',
+         'Google हिन्दी', 'Google Bengali', 'Lekha'],
+        ['en-IN', 'hi-IN']
+      );
+      u.pitch  = 1.05;   // soft, slightly bright
+      u.rate   = 0.80;   // clear and unhurried
+      u.volume = 0.88;   // softer than interviewer
+    }
+
+    return u;
   }
 
-  function chime() {
-    if (!on) return;
-    const ac = getAC(); if (!ac) return;
-    try {
-      [523.25, 659.25, 783.99].forEach((freq, i) => {
-        const o = ac.createOscillator(), g = ac.createGain();
-        o.connect(g); g.connect(ac.destination);
-        o.frequency.value = freq;
-        const t = ac.currentTime + i * 0.11;
-        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.07, t + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
-        o.start(t); o.stop(t + 0.32);
-      });
-    } catch { /**/ }
+  function speakAs(text: string, role: 'interviewer' | 'candidate') {
+    if (!enabled || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = makeUtterance(text, role);
+    u.onstart = () => setSpeaking(role);
+    u.onend   = () => setSpeaking(null);
+    u.onerror = () => setSpeaking(null);
+    window.speechSynthesis.speak(u);
   }
 
-  return { ping, chime };
+  function stop() {
+    window.speechSynthesis?.cancel();
+    setSpeaking(null);
+  }
+
+  function toggle() {
+    const next = !enabled;
+    setEnabled(next);
+    if (!next) {
+      window.speechSynthesis?.cancel();
+      setSpeaking(null);
+    } else {
+      // Play a two-voice intro so the user immediately hears both characters
+      setTimeout(() => {
+        const intro = makeUtterance("Good morning. Let's begin your system design interview.", 'interviewer');
+        intro.onstart = () => setSpeaking('interviewer');
+        intro.onend   = () => {
+          setSpeaking(null);
+          setTimeout(() => {
+            const reply = makeUtterance("Good morning. I am ready. Thank you for this opportunity.", 'candidate');
+            reply.onstart = () => setSpeaking('candidate');
+            reply.onend   = () => setSpeaking(null);
+            window.speechSynthesis?.speak(reply);
+          }, 300);
+        };
+        window.speechSynthesis?.speak(intro);
+      }, 80);
+    }
+  }
+
+  return { enabled, toggle, speakAs, stop, speaking };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -73,22 +138,87 @@ function Badge({ label, color }: { label: string; color: string }) {
   return <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${color}`}>{label}</span>;
 }
 
-function InterviewerBubble({ text }: { text: string }) {
+// Animated sound-wave shown while a role is speaking
+function SpeakingWave({ color }: { color: string }) {
+  return (
+    <div className="flex items-center gap-[3px] h-4">
+      {[0, 1, 2, 3, 4].map(i => (
+        <motion.div
+          key={i}
+          className={`w-[3px] rounded-full ${color}`}
+          animate={{ height: ['3px', '14px', '3px'] }}
+          transition={{ duration: 0.55, repeat: Infinity, delay: i * 0.09, ease: 'easeInOut' }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function InterviewerBubble({
+  text,
+  isSpeaking,
+  onSpeak,
+  onStop,
+  voiceEnabled,
+}: {
+  text: string;
+  isSpeaking: boolean;
+  onSpeak: () => void;
+  onStop: () => void;
+  voiceEnabled: boolean;
+}) {
   return (
     <div className="flex items-start gap-3">
       <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-sm shadow-lg">
         🎙️
       </div>
       <div className="flex-1 rounded-2xl rounded-tl-none border border-indigo-500/30 bg-indigo-500/10 px-4 py-3">
-        <p className="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold mb-1.5">Interviewer</p>
+        <div className="flex items-center justify-between mb-1.5">
+          <p className="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold">Interviewer</p>
+          {voiceEnabled && (
+            <div className="flex items-center gap-2">
+              {isSpeaking && <SpeakingWave color="bg-indigo-400" />}
+              <button
+                onClick={isSpeaking ? onStop : onSpeak}
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold transition-colors ${
+                  isSpeaking
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+                    : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30'
+                }`}
+              >
+                {isSpeaking ? '⏹ Stop' : '▶ Listen'}
+              </button>
+            </div>
+          )}
+        </div>
         <p className="text-gray-200 text-sm leading-relaxed font-medium italic">"{text}"</p>
       </div>
     </div>
   );
 }
 
-function CandidateBubble({ steps }: { steps: string[] }) {
+function CandidateBubble({
+  steps,
+  isSpeaking,
+  onSpeak,
+  onStop,
+  voiceEnabled,
+}: {
+  steps: string[];
+  isSpeaking: boolean;
+  onSpeak: (text: string) => void;
+  onStop: () => void;
+  voiceEnabled: boolean;
+}) {
   const [open, setOpen] = useState(false);
+
+  function handleReveal() {
+    const next = !open;
+    setOpen(next);
+    if (next && voiceEnabled) onSpeak(steps.join('. '));
+    else if (!next) onStop();
+  }
+
   return (
     <div className="flex items-start gap-3">
       <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-sm shadow-lg">
@@ -96,12 +226,13 @@ function CandidateBubble({ steps }: { steps: string[] }) {
       </div>
       <div className="flex-1">
         <button
-          onClick={() => setOpen(o => !o)}
+          onClick={handleReveal}
           className="w-full flex items-center justify-between gap-3 rounded-2xl rounded-tl-none border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-left hover:bg-emerald-500/15 transition-colors"
         >
           <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">
             Candidate Thought Process {open ? '▲' : '▼ (tap to reveal)'}
           </span>
+          {isSpeaking && open && <SpeakingWave color="bg-emerald-400" />}
         </button>
         <AnimatePresence>
           {open && (
@@ -136,10 +267,40 @@ function CandidateBubble({ steps }: { steps: string[] }) {
   );
 }
 
-function IdealAnswer({ points }: { points: { label: string; text: string }[] }) {
+function IdealAnswer({
+  points,
+  isSpeaking,
+  onSpeak,
+  onStop,
+  voiceEnabled,
+}: {
+  points: { label: string; text: string }[];
+  isSpeaking: boolean;
+  onSpeak: (text: string) => void;
+  onStop: () => void;
+  voiceEnabled: boolean;
+}) {
+  const fullText = points.map(p => `${p.label}: ${p.text}`).join('. ');
   return (
     <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 space-y-3">
-      <p className="text-xs font-semibold text-cyan-300 uppercase tracking-wider">✅ Ideal Response Points</p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-cyan-300 uppercase tracking-wider">✅ Ideal Response Points</p>
+        {voiceEnabled && (
+          <div className="flex items-center gap-2">
+            {isSpeaking && <SpeakingWave color="bg-cyan-400" />}
+            <button
+              onClick={isSpeaking ? onStop : () => onSpeak(fullText)}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold transition-colors ${
+                isSpeaking
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30'
+              }`}
+            >
+              {isSpeaking ? '⏹ Stop' : '▶ Hear Answer'}
+            </button>
+          </div>
+        )}
+      </div>
       {points.map((pt, i) => (
         <div key={i} className="flex items-start gap-3">
           <span className="flex-shrink-0 mt-0.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-400 uppercase whitespace-nowrap">
@@ -1040,14 +1201,20 @@ const codeTabs = [
 export default function UrlShortenerPage() {
   const [tab, setTab] = useState<'mock' | 'code' | 'ref'>('mock');
   const [activeQ, setActiveQ] = useState(1);
-  const [soundOn, setSoundOn] = useState(false);
   const [codeTab, setCodeTab] = useState('entity');
-  const { ping, chime } = useSounds(soundOn);
+  const voice = useInterviewVoices();
 
-  function goTo(q: number) {
-    setActiveQ(q);
-    ping();
-    if (q === QUESTIONS.length) chime();
+  // Auto-read the interviewer question whenever the active question changes
+  useEffect(() => {
+    if (voice.enabled && tab === 'mock') {
+      const currentQ = QUESTIONS[activeQ - 1];
+      if (currentQ) voice.speakAs(currentQ.interviewer, 'interviewer');
+    }
+  }, [activeQ, tab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function goTo(n: number) {
+    setActiveQ(n);
+    voice.stop();
   }
 
   const q = QUESTIONS[activeQ - 1];
@@ -1066,12 +1233,29 @@ export default function UrlShortenerPage() {
             <Badge label="🏢 FAANG / MAANG Level" color="bg-violet-500/10 border border-violet-500/30 text-violet-300" />
             <Badge label="⏱ 45 min mock interview" color="bg-yellow-500/10 border border-yellow-500/20 text-yellow-300" />
             <Badge label="5+ years exp" color="bg-blue-500/10 border border-blue-500/20 text-blue-300" />
-            <button
-              onClick={() => setSoundOn(o => !o)}
-              className={`ml-auto px-3 py-1 rounded-full border text-xs font-medium transition-colors ${soundOn ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-gray-700 bg-gray-900 text-gray-400 hover:text-gray-200'}`}
-            >
-              {soundOn ? '🔊 Sound On' : '🔇 Sound Off'}
-            </button>
+            <div className="ml-auto flex items-center gap-2">
+              {voice.speaking && (
+                <div className="flex items-center gap-1.5">
+                  <SpeakingWave color={voice.speaking === 'interviewer' ? 'bg-indigo-400' : 'bg-emerald-400'} />
+                  <span className="text-[10px] text-gray-400 hidden sm:inline">
+                    {voice.speaking === 'interviewer' ? 'Interviewer speaking…' : 'Candidate speaking…'}
+                  </span>
+                  <button onClick={voice.stop} className="text-[10px] text-red-400 hover:text-red-300 border border-red-500/30 bg-red-500/10 px-2 py-0.5 rounded-md">
+                    ⏹ Stop
+                  </button>
+                </div>
+              )}
+              <button
+                onClick={voice.toggle}
+                className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors ${
+                  voice.enabled
+                    ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-300'
+                    : 'border-gray-700 bg-gray-900 text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                {voice.enabled ? '🎙️ Voice On' : '🔇 Voice Off'}
+              </button>
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-black text-white mb-3">
@@ -1226,12 +1410,30 @@ export default function UrlShortenerPage() {
                         <p className="text-xs text-gray-500">Expected time: {q.time}</p>
                       </div>
                     </div>
-                    <InterviewerBubble text={q.interviewer} />
+                    <InterviewerBubble
+                      text={q.interviewer}
+                      isSpeaking={voice.speaking === 'interviewer'}
+                      voiceEnabled={voice.enabled}
+                      onSpeak={() => voice.speakAs(q.interviewer, 'interviewer')}
+                      onStop={voice.stop}
+                    />
                   </div>
 
                   {/* Thinking + Ideal Answer */}
-                  <CandidateBubble steps={q.thinking} />
-                  <IdealAnswer points={q.idealAnswer} />
+                  <CandidateBubble
+                    steps={q.thinking}
+                    isSpeaking={voice.speaking === 'candidate'}
+                    voiceEnabled={voice.enabled}
+                    onSpeak={(text) => voice.speakAs(text, 'candidate')}
+                    onStop={voice.stop}
+                  />
+                  <IdealAnswer
+                    points={q.idealAnswer}
+                    isSpeaking={voice.speaking === 'candidate'}
+                    voiceEnabled={voice.enabled}
+                    onSpeak={(text) => voice.speakAs(text, 'candidate')}
+                    onStop={voice.stop}
+                  />
 
                   {/* Per-question visual component */}
                   <div className="rounded-2xl border border-gray-800 bg-gray-950/60 p-5">

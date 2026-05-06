@@ -29,6 +29,7 @@ const DBScalingReadsCaseStudyPage = lazy(() => import('./pages/DBScalingReadsCas
 const DBScalingWritesCaseStudyPage = lazy(() => import('./pages/DBScalingWritesCaseStudyPage'));
 const SolidPrinciplesPage = lazy(() => import('./pages/SolidPrinciplesPage'));
 const UrlShortenerPage    = lazy(() => import('./pages/UrlShortenerPage'));
+const LRUCachePage        = lazy(() => import('./pages/LRUCachePage'));
 
 function PageSpinner() {
   return (
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/case-study/swiggy-writes"  element={<Suspense fallback={<PageSpinner />}><DBScalingWritesCaseStudyPage /></Suspense>} />
           <Route path="/solid"                 element={<Suspense fallback={<PageSpinner />}><SolidPrinciplesPage /></Suspense>} />
           <Route path="/mock/url-shortener"   element={<Suspense fallback={<PageSpinner />}><UrlShortenerPage /></Suspense>} />
+          <Route path="/mock/lru-cache"       element={<Suspense fallback={<PageSpinner />}><LRUCachePage /></Suspense>} />
           <Route path="/progress"              element={<ProgressPage />} />
           <Route path="*"                      element={<Navigate to="/" replace />} />
         </Route>
