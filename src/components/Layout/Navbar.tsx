@@ -21,6 +21,7 @@ const navLinks = [
   { to: '/kafka', label: 'Kafka' },
   { to: '/mock/url-shortener', label: 'Mock: URL' },
   { to: '/mock/lru-cache', label: 'Mock: LRU' },
+  { to: '/mock/parking-lot', label: 'Mock: Parking' },
   { to: '/progress', label: 'Progress' },
 ];
 

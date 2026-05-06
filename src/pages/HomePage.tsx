@@ -50,6 +50,13 @@ const learningAreas = [
     to: '/mock/lru-cache',
   },
   {
+    title: 'Mock Interview: Parking Lot',
+    description: 'OOP design, Strategy pattern, concurrency, city-wide scale. Interactive lot visualizer with park & exit simulation.',
+    icon: '🅿️',
+    accent: 'from-blue-400 to-violet-400',
+    to: '/mock/parking-lot',
+  },
+  {
     title: 'Kafka Deep Dive',
     description: 'Topics, partitions, consumer groups, retention, and exactly-once semantics.',
     icon: '🌊',
